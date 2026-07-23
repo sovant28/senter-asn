@@ -45,7 +45,7 @@ export function Sidebar({ className = "", onClose }: SidebarProps) {
             SENTER ASN
           </h1>
           <span className="text-[10px] font-bold text-teal-700 block mt-1">
-            Kab. Tana Toraja
+            BKPSDM Kab. Tana Toraja
           </span>
         </div>
       </div>

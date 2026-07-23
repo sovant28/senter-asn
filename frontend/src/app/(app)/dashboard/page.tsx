@@ -349,7 +349,7 @@ export default function DashboardPage() {
             <div className="space-y-3 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 text-teal-800 rounded-full text-xs font-bold border border-teal-200">
                 <Building2 className="w-3.5 h-3.5 text-teal-700" />
-                SENTER ASN — BKPSDM
+                SENTER ASN — BKPSDM Kab. Tana Toraja
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight leading-tight">
                 Sistem Evaluasi & Rekapitulasi Disiplin Kerja ASN
@@ -382,7 +382,7 @@ export default function DashboardPage() {
               Evaluasi Kedisiplinan Kehadiran
             </span>
             <h2 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Senter ASN BKPSDM
+              SENTER ASN — BKPSDM Kab. Tana Toraja
             </h2>
             <p className="text-xs text-[#ccfbf1]/95 font-medium leading-relaxed">
               Halo, <span className="font-bold text-white">{user.nama_lengkap}</span>. Sistem early warning presensi menunjukkan tingkat kepatuhan rata-rata dinas saat ini berada pada tingkat kedisiplinan yang memadai.

@@ -14,7 +14,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "SENTER ASN — Kabupaten Tana Toraja",
+  title: "SENTER ASN — BKPSDM Kabupaten Tana Toraja",
   description: "Sistem Evaluasi Disiplin Kerja & Rekapitulasi Otomatis ASN BKPSDM Kabupaten Tana Toraja",
   icons: {
     icon: "/logo.png",

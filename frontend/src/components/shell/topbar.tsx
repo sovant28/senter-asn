@@ -42,7 +42,7 @@ export function Topbar({ onMenuClick, title }: TopbarProps) {
         {/* Breadcrumbs / Page Title */}
         <div>
           <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 tracking-wider">
-            <span>Senter ASN</span>
+            <span>SENTER ASN</span>
             <span>/</span>
             <span className="text-slate-500">{title}</span>
           </div>
