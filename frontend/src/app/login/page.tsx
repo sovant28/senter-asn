@@ -140,11 +140,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Debug API URL */}
-          <div className="text-center text-[9px] text-slate-300 font-mono select-none">
-            API: {process.env.NEXT_PUBLIC_API_URL || "fallback (localhost)"}
-          </div>
-
           {/* Footer info for Mobile View */}
           <div className="block md:hidden text-center text-[10px] text-slate-400 font-medium pt-4 border-t border-slate-100">
             © {new Date().getFullYear()} BKPSDM Tana Toraja.
