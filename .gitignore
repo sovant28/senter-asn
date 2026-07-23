@@ -1,0 +1,33 @@
+# Environment & secret files
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Dependencies
+node_modules/
+backend/.venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build & Next.js outputs
+frontend/.next/
+frontend/out/
+backend/build/
+backend/dist/
+*.egg-info/
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Pytest & Cache
+.pytest_cache/
+.coverage
+htmlcov/

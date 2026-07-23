@@ -1,0 +1,27 @@
+kode_opd,nama_opd,tipe_opd,is_active
+DISDIK,Dinas Pendidikan,DINAS,true
+DINKES,Dinas Kesehatan,DINAS,true
+PUTR,Dinas Pekerjaan Umum dan Tata Ruang,DINAS,true
+PERTANIAN,Dinas Pertanian,DINAS,true
+PERIKANAN,Dinas Perikanan,DINAS,true
+LINGKUNGAN,Dinas Lingkungan Hidup,DINAS,true
+SOSIAL,Dinas Sosial,DINAS,true
+PERHUBUNGAN,Dinas Perhubungan,DINAS,true
+KOMINFO,Dinas Komunikasi dan Informatika,DINAS,true
+PARIWISATA,Dinas Pariwisata,DINAS,true
+KEBUDAYAAN,Dinas Kebudayaan,DINAS,true
+PORA,Dinas Pemuda dan Olahraga,DINAS,true
+PERDAGANGAN,Dinas Perdagangan,DINAS,true
+PERINDUSTRIAN,Dinas Perindustrian,DINAS,true
+TRANS,Dinas Transmigrasi,DINAS,true
+MASYARAKAT,Dinas Pemberdayaan Masyarakat,DINAS,true
+PEMBERDAYAAN,Dinas Pemberdayaan Perempuan,DINAS,true
+BKPSDM,Badan Kepegawaian dan Pengembangan SDM,BADAN,true
+BKUD,Badan Keuangan Daerah,BADAN,true
+BAPPEDA,Badan Perencanaan Pembangunan Daerah,BADAN,true
+BALITBANG,Badan Penelitian dan Pengembangan,BADAN,true
+KESBANGPOL,Badan Kesatuan Bangsa dan Politik,BADAN,true
+BPBD,Badan Penanggulangan Bencana Daerah,BADAN,true
+SETDA,Sekretariat Daerah,SEKRETARIAT,true
+SETWAN,Sekretariat DPRD,SEKRETARIAT,true
+INSPEKTORAT,Inspektorat,INSPEKTORAT,true

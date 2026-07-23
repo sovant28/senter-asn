@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), sans-serif;
+  --font-display: var(--font-display), sans-serif;
+
+  --color-primary-dark: #0a6c74;
+  --color-primary: #0f766e;
+  --color-primary-light: #f0fdfa;
+  --color-success-dark: #15803d;
+  --color-success: #22c55e;
+  --color-success-light: #f0fdf4;
+  --color-warning: #eab308;
+  --color-warning-light: #fefce8;
+  --color-danger: #dc2626;
+  --color-danger-light: #fef2f2;
+}
