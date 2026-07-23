@@ -37,15 +37,13 @@ export default function LoginPage() {
 
         {/* Brand Logo Header */}
         <div className="flex items-center gap-3 relative z-10">
-          <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.png" alt="Logo Pemkab Tana Toraja" className="w-12 h-14 object-contain filter drop-shadow-md" />
           <div>
-            <h1 className="font-display font-bold text-white tracking-tight leading-none text-base">
-              Senter ASN
+            <h1 className="font-display font-bold text-white tracking-tight leading-none text-lg">
+              SENTER ASN
             </h1>
-            <span className="text-[10px] font-bold text-primary-light/80 tracking-wider">
-              BKPSDM Tana Toraja
+            <span className="text-[11px] font-bold text-primary-light/90 tracking-wider block mt-1">
+              BKPSDM Kabupaten Tana Toraja
             </span>
           </div>
         </div>
@@ -59,7 +57,7 @@ export default function LoginPage() {
             Pengawasan Disiplin ASN yang Lebih Cerdas & Transparan
           </h2>
           <p className="text-xs text-[#ccfbf1]/90 leading-relaxed font-medium">
-            Senter ASN membantu Pemerintah Kabupaten Tana Toraja memantau tingkat kehadiran, kepatuhan jam kerja, dan hadir efektif OPD pelayanan publik secara akurat dan real-time.
+            SENTER ASN membantu Pemerintah Kabupaten Tana Toraja memantau tingkat kehadiran, kepatuhan jam kerja, dan hadir efektif OPD pelayanan publik secara akurat dan real-time.
           </p>
         </div>
 
@@ -72,15 +70,20 @@ export default function LoginPage() {
       {/* Right side: Login Form Pane */}
       <div className="flex-1 flex items-center justify-center p-8 bg-slate-50/30 sm:bg-white">
         <div className="w-full max-w-sm space-y-8 bg-white p-8 sm:p-0 rounded-3xl border sm:border-0 border-slate-200/80">
-          {/* Brand Header for Mobile View */}
-          <div className="text-center md:text-left space-y-2">
-            <div className="inline-flex md:hidden w-12 h-12 bg-primary-light border border-primary/10 rounded-2xl items-center justify-center mb-2">
-              <Shield className="w-6 h-6 text-primary-dark" />
+          {/* Brand Header for Form */}
+          <div className="text-center md:text-left space-y-3">
+            <div className="flex items-center justify-center md:justify-start gap-3">
+              <img src="/logo.png" alt="Logo Pemkab Tana Toraja" className="w-12 h-14 object-contain drop-shadow-sm" />
+              <div>
+                <h2 className="font-display text-xl font-extrabold text-slate-800 tracking-tight leading-tight">
+                  SENTER ASN
+                </h2>
+                <p className="text-[11px] text-slate-500 font-bold">
+                  BKPSDM Kab. Tana Toraja
+                </p>
+              </div>
             </div>
-            <h2 className="font-display text-2xl font-extrabold text-slate-800 tracking-tight">
-              Selamat Datang
-            </h2>
-            <p className="text-xs text-slate-400 font-semibold">
+            <p className="text-xs text-slate-400 font-semibold pt-1">
               Silakan masuk ke akun Anda untuk mengelola dashboard presensi
             </p>
           </div>

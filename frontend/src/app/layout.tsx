@@ -14,8 +14,13 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Senter ASN — BKPSDM Kab. Tana Toraja",
-  description: "Sistem Early Warning Presensi Aparatur Sipil Negara",
+  title: "SENTER ASN — Kabupaten Tana Toraja",
+  description: "Sistem Evaluasi Disiplin Kerja & Rekapitulasi Otomatis ASN BKPSDM Kabupaten Tana Toraja",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

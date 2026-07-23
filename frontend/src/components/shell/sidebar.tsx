@@ -38,16 +38,14 @@ export function Sidebar({ className = "", onClose }: SidebarProps) {
       className={`w-64 bg-white border-r border-slate-100 flex flex-col h-screen fixed lg:sticky top-0 z-30 transition-transform duration-300 ${className}`}
     >
       {/* Brand Header */}
-      <div className="h-16 px-6 border-b border-slate-100 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-primary-dark flex items-center justify-center">
-          <Shield className="w-5 h-5 text-white" />
-        </div>
+      <div className="h-20 px-6 border-b border-slate-100 flex items-center gap-3">
+        <img src="/logo.png" alt="Logo Pemkab Tana Toraja" className="w-9 h-11 object-contain drop-shadow-sm" />
         <div>
-          <h1 className="font-display font-bold text-slate-800 tracking-tight leading-none text-sm">
-            Senter ASN
+          <h1 className="font-display font-extrabold text-slate-800 tracking-tight leading-none text-base">
+            SENTER ASN
           </h1>
-          <span className="text-[10px] font-semibold text-slate-400">
-            BKPSDM Tana Toraja
+          <span className="text-[10px] font-bold text-teal-700 block mt-1">
+            Kab. Tana Toraja
           </span>
         </div>
       </div>
