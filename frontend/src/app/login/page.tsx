@@ -71,19 +71,24 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-8 bg-slate-50/30 sm:bg-white">
         <div className="w-full max-w-sm space-y-8 bg-white p-8 sm:p-0 rounded-3xl border sm:border-0 border-slate-200/80">
           {/* Brand Header for Form */}
-          <div className="text-center md:text-left space-y-3">
-            <div className="flex items-center justify-center md:justify-start gap-3">
-              <img src="/logo.png" alt="Logo Pemkab Tana Toraja" className="w-12 h-14 object-contain drop-shadow-sm" />
-              <div>
-                <h2 className="font-display text-xl font-extrabold text-slate-800 tracking-tight leading-tight">
+          <div className="text-center md:text-left space-y-2">
+            {/* Mobile logo only (hidden on desktop view) */}
+            <div className="flex md:hidden items-center justify-center gap-3 mb-2">
+              <img src="/logo.png" alt="Logo Pemkab Tana Toraja" className="w-10 h-12 object-contain drop-shadow-sm" />
+              <div className="text-left">
+                <h2 className="font-display text-lg font-extrabold text-slate-800 tracking-tight leading-none">
                   SENTER ASN
                 </h2>
-                <p className="text-[11px] text-slate-500 font-bold">
+                <p className="text-[10px] text-slate-500 font-bold mt-0.5">
                   BKPSDM Kab. Tana Toraja
                 </p>
               </div>
             </div>
-            <p className="text-xs text-slate-400 font-semibold pt-1">
+
+            <h2 className="font-display text-2xl font-extrabold text-slate-800 tracking-tight">
+              Selamat Datang
+            </h2>
+            <p className="text-xs text-slate-400 font-semibold">
               Silakan masuk ke akun Anda untuk mengelola dashboard presensi
             </p>
           </div>
