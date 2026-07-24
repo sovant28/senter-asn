@@ -140,6 +140,14 @@ class AnalyticsService:
         )
         opd_hari_kerja = {row.opd_id: row.mode_days for row in result_hari_kerja.all()}
 
+        # Delete existing aggregates for this period (clean recalculation slate)
+        await self.session.execute(
+            delete(PresensiAgregatOPD).where(
+                PresensiAgregatOPD.tahun == tahun,
+                PresensiAgregatOPD.bulan == bulan,
+            )
+        )
+
         opds = await self._get_active_opds()
         results: list[PresensiAgregatOPD] = []
 
@@ -156,15 +164,6 @@ class AnalyticsService:
             persen = hitung_persentase(counter)
             skor = hitung_skor(persen)
             kategori = tentukan_kategori(skor.total_skor)
-
-            # Delete existing aggregate for this OPD and period if re-uploading
-            await self.session.execute(
-                delete(PresensiAgregatOPD).where(
-                    PresensiAgregatOPD.opd_id == opd.id,
-                    PresensiAgregatOPD.tahun == tahun,
-                    PresensiAgregatOPD.bulan == bulan,
-                )
-            )
 
             agregat = PresensiAgregatOPD(
                 upload_id=upload_id,
