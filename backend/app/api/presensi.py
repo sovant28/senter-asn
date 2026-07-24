@@ -125,17 +125,19 @@ async def upload_presensi(
         for pe in new_pegs:
             existing_peg_nips[pe.nip] = pe.id
 
-    # --- Write presensi rows (Clean overwrite for same period & pegawai) ---
+    # --- Write presensi rows (Clean overwrite for the uploaded OPDs and period) ---
     if result.rows:
         target_tahun = result.rows[0].tahun
         target_bulan = result.rows[0].bulan
-        peg_ids = [p_id for p_id in existing_peg_nips.values() if p_id is not None]
-        if peg_ids:
+        opd_ids = [opd_by_name[name][0] for name in unit_names if name in opd_by_name]
+        if opd_ids:
             await db.execute(
                 delete(PresensiRaw).where(
-                    PresensiRaw.pegawai_id.in_(peg_ids),
                     PresensiRaw.tahun == target_tahun,
                     PresensiRaw.bulan == target_bulan,
+                    PresensiRaw.pegawai_id.in_(
+                        select(Pegawai.id).where(Pegawai.opd_id.in_(opd_ids))
+                    ),
                 )
             )
 
