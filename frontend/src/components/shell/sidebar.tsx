@@ -12,6 +12,7 @@ import {
   Shield,
   User,
   Award,
+  Info,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -29,6 +30,7 @@ export function Sidebar({ className = "", onClose }: SidebarProps) {
     { name: "Upload Excel", href: "/upload", icon: Upload },
     { name: "Laporan PDF", href: "/reports", icon: FileText },
     { name: "Metode Perhitungan", href: "/perhitungan", icon: Calculator },
+    { name: "Tentang Sistem", href: "/tentang", icon: Info },
   ];
 
   if (!user) return null;

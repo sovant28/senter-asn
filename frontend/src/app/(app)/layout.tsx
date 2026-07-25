@@ -15,6 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (path.startsWith("/upload")) return "Upload Data Presensi";
     if (path.startsWith("/reports")) return "Laporan PDF";
     if (path.startsWith("/perhitungan")) return "Metode Analisis";
+    if (path.startsWith("/tentang")) return "Tentang Sistem";
     return "SENTER ASN";
   };
 
