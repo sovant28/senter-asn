@@ -74,7 +74,7 @@ export default function RankingPage() {
       SANGAT_DISIPLIN: "bg-emerald-50 text-emerald-700 border-emerald-200",
       DISIPLIN: "bg-green-50 text-green-700 border-green-200",
       CUKUP: "bg-amber-50 text-amber-600 border-amber-200",
-      KURANG: "bg-red-50 text-red-600 border-red-200",
+      PERLU_PEMBINAAN: "bg-red-50 text-red-600 border-red-200",
     }[kat] || "bg-slate-50 text-slate-600 border-slate-200");
 
   const katLabel = (kat: string) =>
@@ -82,7 +82,7 @@ export default function RankingPage() {
       SANGAT_DISIPLIN: "Sangat Disiplin",
       DISIPLIN: "Disiplin",
       CUKUP: "Cukup",
-      KURANG: "Kurang",
+      PERLU_PEMBINAAN: "Perlu Pembinaan",
     }[kat] || kat);
 
   const filteredRankings = rankings.filter((r) =>

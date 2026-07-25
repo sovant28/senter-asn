@@ -99,7 +99,7 @@ export default function DashboardPage() {
     SANGAT_DISIPLIN: 0,
     DISIPLIN: 0,
     CUKUP: 0,
-    KURANG: 0,
+    PERLU_PEMBINAAN: 0,
   };
   rankings.forEach((r) => {
     if (r.kategori in dist) dist[r.kategori]++;
@@ -115,7 +115,7 @@ export default function DashboardPage() {
     if (score >= 90) return { label: "Sangat Disiplin", color: "text-success-dark bg-success-light border-success/20" };
     if (score >= 80) return { label: "Disiplin", color: "text-success-dark bg-success-light border-success/20" };
     if (score >= 70) return { label: "Cukup", color: "text-warning bg-warning-light border-warning/20" };
-    return { label: "Kurang", color: "text-danger bg-danger-light border-danger/20" };
+    return { label: "Perlu Pembinaan", color: "text-danger bg-danger-light border-danger/20" };
   };
 
   const avgCat = getAvgCategory(avgSkor);
@@ -180,7 +180,7 @@ export default function DashboardPage() {
           { value: dist.SANGAT_DISIPLIN, name: "Sangat Disiplin", itemStyle: { color: "#15803d" } },
           { value: dist.DISIPLIN, name: "Disiplin", itemStyle: { color: "#22c55e" } },
           { value: dist.CUKUP, name: "Cukup", itemStyle: { color: "#eab308" } },
-          { value: dist.KURANG, name: "Kurang", itemStyle: { color: "#dc2626" } },
+          { value: dist.PERLU_PEMBINAAN, name: "Perlu Pembinaan", itemStyle: { color: "#dc2626" } },
         ],
       },
     ],
@@ -280,7 +280,7 @@ export default function DashboardPage() {
       SANGAT_DISIPLIN: "bg-emerald-50 text-emerald-700 border-emerald-200",
       DISIPLIN: "bg-green-50 text-green-700 border-green-200",
       CUKUP: "bg-amber-50 text-amber-600 border-amber-200",
-      KURANG: "bg-red-50 text-red-600 border-red-200",
+      PERLU_PEMBINAAN: "bg-red-50 text-red-600 border-red-200",
     }[kat] || "bg-slate-50 text-slate-600 border-slate-200");
 
   const katLabel = (kat: string) =>
@@ -288,7 +288,7 @@ export default function DashboardPage() {
       SANGAT_DISIPLIN: "Sangat Disiplin",
       DISIPLIN: "Disiplin",
       CUKUP: "Cukup",
-      KURANG: "Kurang",
+      PERLU_PEMBINAAN: "Perlu Pembinaan",
     }[kat] || kat);
 
 
@@ -438,7 +438,7 @@ export default function DashboardPage() {
         />
         <StatsCard
           label="Perlu Pembinaan"
-          value={dist.KURANG}
+          value={dist.PERLU_PEMBINAAN}
           icon={AlertTriangle}
           iconBgColor="bg-danger-light"
           iconColor="text-danger"
