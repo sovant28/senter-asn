@@ -144,8 +144,11 @@ export default function TentangSistemPage() {
             Penentuan nilai disiplin akhir OPD menggunakan metode <strong>Simple Additive Weighting (SAW)</strong>, yaitu mencari penjumlahan terbobot dari rating kinerja alternatif pada seluruh kriteria penilaian benefit.
           </p>
 
-          <div className="bg-slate-100/50 p-4 rounded-xl border border-slate-200/60 text-slate-850 text-center font-mono text-sm">
-            {"\\( V_i = \\sum_{j=1}^{n} w_j r_{ij} \\)"}
+          <div className="bg-slate-100/50 p-4 rounded-xl border border-slate-200/60 text-slate-800 text-center font-display py-3.5 flex items-center justify-center gap-1.5">
+            <span className="font-extrabold text-base md:text-lg">V<sub>i</sub></span>
+            <span className="font-extrabold text-base md:text-lg">=</span>
+            <span className="text-xl md:text-2xl font-normal">∑</span>
+            <span className="font-extrabold text-base md:text-lg">(w<sub>j</sub> × r<sub>ij</sub>)</span>
           </div>
 
           <p className="text-xs text-slate-500 leading-relaxed">
