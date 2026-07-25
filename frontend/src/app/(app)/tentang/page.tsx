@@ -3,19 +3,7 @@
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import {
-  Code2,
-  Cpu,
-  Database,
-  Calculator,
-  AlertTriangle,
-  CheckCircle,
-  HelpCircle,
-  FileSpreadsheet,
-  Calendar,
-  Lock,
-  ChevronRight,
-} from "lucide-react";
+import { Cpu, Heart } from "lucide-react";
 
 export default function TentangSistemPage() {
   const { user, loading } = useAuth();
@@ -37,243 +25,180 @@ export default function TentangSistemPage() {
   if (!user) return null;
 
   return (
-    <div className="space-y-10 w-full pb-16">
-      {/* ===== HERO HEADER ===== */}
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-8 md:p-12 shadow-xl border border-slate-800">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#0f766e,transparent_60%)] opacity-40" />
-        <div className="relative z-10 space-y-4 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-bold uppercase tracking-wider">
-            <Cpu className="w-3.5 h-3.5" /> Core Engine SENTER ASN
-          </div>
-          <h2 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight leading-tight">
-            Transparansi &amp; Metodologi Sistem SENTER ASN
-          </h2>
-          <p className="text-slate-300 text-sm md:text-base font-medium leading-relaxed">
-            Selamat datang di dalaman sistem <strong>SENTER ASN</strong> (Sistem Evaluasi Kinerja Terpadu ASN). 
-            Halaman ini didedikasikan bagi para akademisi, penguji, dan birokrat untuk melihat secara transparan bagaimana data presensi diproses, dibersihkan dari galat manusia (*human error*), dan dihitung secara ilmiah.
-          </p>
+    <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12 text-slate-700 antialiased selection:bg-teal-100 selection:text-teal-905">
+      {/* ===== HERO TITLE ===== */}
+      <div className="space-y-4 border-b border-slate-100 pb-8 text-center sm:text-left">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-[10px] font-bold uppercase tracking-wider">
+          <Cpu className="w-3 h-3" /> Metodologi &amp; Spesifikasi
         </div>
+        <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          Tentang Sistem SENTER ASN
+        </h1>
+        <p className="text-base text-slate-500 font-medium leading-relaxed max-w-2xl">
+          Dokumentasi teknis, landasan teoritis, dan alur perancangan platform evaluasi disiplin terpadu BKPSDM Kabupaten Tana Toraja.
+        </p>
       </div>
 
-      {/* ===== METODE PENELITIAN: SAW (DECISION SUPPORT SYSTEM) ===== */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 space-y-6 shadow-sm">
-        <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-          <div className="p-2.5 rounded-xl bg-teal-50 text-teal-600">
-            <Calculator className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-display text-lg font-bold text-slate-800 leading-snug">
-              Metodologi SPK: Simple Additive Weighting (SAW)
-            </h3>
-            <p className="text-xs text-slate-400 font-semibold uppercase mt-0.5">
-              Decision Support System (DSS) / Sistem Pendukung Keputusan (SPK)
-            </p>
-          </div>
-        </div>
-
+      {/* ===== LATAR BELAKANG ===== */}
+      <section className="space-y-4">
+        <h2 className="font-display text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <span className="text-teal-600">01.</span> Latar Belakang
+        </h2>
         <div className="text-sm text-slate-600 leading-relaxed space-y-4">
           <p>
-            SENTER ASN dirancang tidak sekadar untuk menampilkan angka mentah, melainkan bertindak sebagai <strong>Sistem Pendukung Keputusan (SPK)</strong>. 
-            Sistem kami menerapkan metode <strong>Simple Additive Weighting (SAW)</strong> secara matematis untuk melakukan perangkingan tingkat disiplin seluruh OPD di Kabupaten Tana Toraja.
+            Pengukuran kedisiplinan Aparatur Sipil Negara (ASN) merupakan salah satu pilar krusial dalam reformasi birokrasi dan peningkatan kualitas pelayanan publik. Selama ini, rekapitulasi data kehadiran dan kepatuhan jam kerja di tingkat Organisasi Perangkat Daerah (OPD) sering kali dilakukan secara manual menggunakan perangkat lunak spreadsheet konvensional.
           </p>
-          
-          <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200/60 max-w-2xl mx-auto text-center space-y-3 font-display">
-            <div className="text-lg md:text-xl font-extrabold text-slate-800 tracking-wide py-2 flex items-center justify-center gap-1.5">
-              <span>V<sub>i</sub></span>
-              <span>=</span>
-              <span className="text-xl md:text-2xl font-normal">∑</span>
-              <span>(w<sub>j</sub> × r<sub>ij</sub>)</span>
-            </div>
-            <div className="text-xs text-slate-500 font-semibold leading-relaxed">
-              Di mana <strong className="text-teal-700">w_j</strong> adalah bobot kriteria, dan <strong className="text-teal-700">r_ij</strong> adalah rating kinerja ternormalisasi dari alternatif (OPD) ke-i pada kriteria ke-j.
-            </div>
-          </div>
-
           <p>
-            Karena rentang nilai kriteria di SENTER ASN adalah persentase (0% s.d. 100%) dan seluruh kriteria bersifat <strong>Benefit</strong> (semakin tinggi nilai semakin baik), maka normalisasi dapat dilakukan secara linier langsung dari nilai persentasenya.
+            Pendekatan manual ini rentan terhadap beberapa kendala mendasar. Galat manusia (*human error*) berupa kesalahan penulisan NIP, inkonsistensi penulisan nama instansi, hingga rumus kalkulasi yang tidak seragam (seperti rentang penjumlahan total yang terpotong) sering kali menyebabkan deviasi nilai rekapitulasi. Di samping itu, ketiadaan standardisasi penghitungan hari kerja efektif bulanan memperlemah objektivitas hasil evaluasi disiplin kerja kuantitatif.
+          </p>
+          <p>
+            Oleh karena itu, diperlukan sebuah platform berbasis web yang terintegrasi untuk mengotomatisasi pengolahan data mentah absensi secara objektif, transparan, dan dapat dipertanggungjawabkan sesuai dengan ketentuan regulasi kepegawaian yang berlaku.
           </p>
         </div>
+      </section>
 
-        {/* Weights Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 pt-4">
-          <div className="p-5 rounded-2xl bg-teal-50/30 border border-teal-100 flex flex-col justify-between">
-            <div>
-              <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest block">Kriteria C1 (25%)</span>
-              <h4 className="font-display font-extrabold text-slate-800 mt-1 leading-snug">Persentase Kehadiran</h4>
-            </div>
-            <p className="text-xs text-slate-500 mt-3 font-medium">
-              Dihitung dari rasio jumlah kehadiran riil pegawai terhadap total kewajiban hadir kalender.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-teal-50/30 border border-teal-100 flex flex-col justify-between">
-            <div>
-              <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest block">Kriteria C2 (20%)</span>
-              <h4 className="font-display font-extrabold text-slate-800 mt-1 leading-snug">Kepatuhan Jam Kerja</h4>
-            </div>
-            <p className="text-xs text-slate-500 mt-3 font-medium">
-              Ditentukan dari persentase pelanggaran keterlambatan (TM1-TM3, TMM, ITM) dan pulang cepat (PC1-PC3, PCM, IPC).
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-teal-50/30 border border-teal-100 flex flex-col justify-between">
-            <div>
-              <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest block">Kriteria C3 (15%)</span>
-              <h4 className="font-display font-extrabold text-slate-800 mt-1 leading-snug">Nilai Ketidakhadiran</h4>
-            </div>
-            <p className="text-xs text-slate-500 mt-3 font-medium">
-              Diukur secara ketat berdasarkan ketidakhadiran tanpa keterangan (TK) maupun izin tidak masuk penuh (ITMPC).
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-teal-50/30 border border-teal-100 flex flex-col justify-between">
-            <div>
-              <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest block">Kriteria C4 (40%)</span>
-              <h4 className="font-display font-extrabold text-slate-800 mt-1 leading-snug">Persentase Hadir Efektif</h4>
-            </div>
-            <p className="text-xs text-slate-500 mt-3 font-medium">
-              Indikator dengan bobot tertinggi. Menghitung akumulasi kehadiran bersih pegawai berstatus normal atau tugas resmi (HN, IDL, DL, CT, CB, CS, CM, CKAP).
-            </p>
-          </div>
+      {/* ===== TUJUAN ===== */}
+      <section className="space-y-4">
+        <h2 className="font-display text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <span className="text-teal-600">02.</span> Tujuan
+        </h2>
+        <div className="text-sm text-slate-600 leading-relaxed space-y-3">
+          <p>
+            Pengembangan sistem <strong>SENTER ASN</strong> diarahkan untuk mencapai sasaran-sasaran strategis berikut:
+          </p>
+          <ul className="list-disc pl-5 space-y-2 text-slate-600 font-medium">
+            <li>
+              <strong>Standardisasi Perhitungan:</strong> Menyatukan seluruh parameter evaluasi kehadiran dan kepatuhan jam kerja ASN di bawah satu mesin kalkulasi terpusat untuk meniadakan perbedaan versi perhitungan.
+            </li>
+            <li>
+              <strong>Integritas dan Validasi Data:</strong> Mengeliminasi kesalahan penulisan identitas pegawai (NIP) dan OPD duplikat melalui modul pembersihan data otomatis saat berkas diunggah.
+            </li>
+            <li>
+              <strong>Transparansi Penilaian:</strong> Menyajikan visualisasi skor yang dapat ditelusuri secara terperinci hingga ke level individu pegawai guna mencegah manipulasi nilai manual.
+            </li>
+            <li>
+              <strong>Pendukung Keputusan Strategis:</strong> Membantu pimpinan daerah dan BKPSDM dalam mengidentifikasi OPD yang memerlukan pembinaan disiplin secara cepat dan akurat.
+            </li>
+          </ul>
         </div>
-      </div>
+      </section>
 
-      {/* ===== KECERDASAN DETEKSI DATA & HARI KERJA DYNAMIC ===== */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* ===== MANFAAT ===== */}
+      <section className="space-y-4">
+        <h2 className="font-display text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <span className="text-teal-600">03.</span> Manfaat
+        </h2>
+        <div className="text-sm text-slate-600 leading-relaxed space-y-3">
+          <p>
+            Kehadiran platform SENTER ASN memberikan kontribusi nyata bagi ekosistem birokrasi Kabupaten Tana Toraja:
+          </p>
+          <ul className="list-disc pl-5 space-y-2 text-slate-600 font-medium">
+            <li>
+              <strong>Bagi BKPSDM:</strong> Mempercepat proses kompilasi laporan bulanan dari hari ke menit, serta menjamin keabsahan data laporan disiplin sebelum diajukan ke pimpinan daerah.
+            </li>
+            <li>
+              <strong>Bagi Pimpinan Daerah (Bupati &amp; Sekda):</strong> Memperoleh potret disiplin kerja instansi secara objektif berbasis bukti (*evidence-based*) sebagai basis pemberian penghargaan (*reward*) atau pembinaan (*punishment*).
+            </li>
+            <li>
+              <strong>Bagi Administrator OPD:</strong> Mempermudah proses pengunggahan laporan bulanan dengan sistem pembersihan otomatis yang fleksibel terhadap perubahan penulisan kolom.
+            </li>
+            <li>
+              <strong>Bagi Institusi Akademik &amp; Riset:</strong> Menjadi model rujukan penerapan teknologi informasi terapan dalam ranah tata kelola pemerintahan (e-Government).
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      {/* ===== DESKRIPSI SISTEM & METODE ===== */}
+      <section className="space-y-6">
+        <h2 className="font-display text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <span className="text-teal-600">04.</span> Deskripsi Sistem &amp; Metodologi
+        </h2>
         
-        {/* Card A: Deteksi Hari Kerja Statistik */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 space-y-4 shadow-sm flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-              <div className="p-2 rounded-lg bg-teal-50 text-teal-600">
-                <Calendar className="w-5 h-5" />
+        <div className="text-sm text-slate-600 leading-relaxed space-y-4">
+          <p>
+            SENTER ASN dikembangkan sebagai <strong>Decision Support System (DSS)</strong> atau Sistem Pendukung Keputusan (SPK) yang memadukan automasi pembersihan data mentah dengan pemodelan penilaian kuantitatif. Tiga pilar utama pengolahan data pada sistem ini meliputi:
+          </p>
+
+          {/* Sub 1: SAW */}
+          <div className="space-y-3 pt-2">
+            <h3 className="font-display text-base font-bold text-slate-800">
+              A. Pemodelan Evaluasi dengan Simple Additive Weighting (SAW)
+              </h3>
+            <p>
+              Penentuan nilai disiplin akhir OPD menggunakan metode <strong>Simple Additive Weighting (SAW)</strong>, yaitu mencari penjumlahan terbobot dari rating kinerja alternatif pada seluruh kriteria penilaian benefit. Sistem mengevaluasi empat kriteria utama:
+            </p>
+            <ul className="list-decimal pl-5 space-y-1.5 font-medium text-slate-600">
+              <li>
+                <strong>Persentase Kehadiran (C1 - Bobot 25%):</strong> Rasio total kehadiran fisik pegawai (termasuk toleransi dinas) terhadap kewajiban hari kerja.
+              </li>
+              <li>
+                <strong>Nilai Kepatuhan Jam Kerja (C2 - Bobot 20%):</strong> Diukur berdasarkan ketiadaan pelanggaran keterlambatan masuk kerja dan pulang cepat.
+              </li>
+              <li>
+                <strong>Nilai Ketidakhadiran (C3 - Bobot 15%):</strong> Pengurangan nilai akibat alpa atau absen penuh tanpa keterangan sah.
+              </li>
+              <li>
+                <strong>Persentase Hadir Efektif (C4 - Bobot 40%):</strong> Menghitung total kehadiran bersih pegawai berstatus normal atau tugas resmi (Hadir Normal, Izin Dinas Luar, Dinas Luar, Cuti Tahunan/Sakit/Besar/Melahirkan).
+              </li>
+            </ul>
+            
+            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 font-display my-3">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rumus Evaluasi SAW</span>
+              <div className="text-base font-extrabold text-slate-800 tracking-wide flex items-center gap-1">
+                <span>V<sub>i</sub></span>
+                <span>=</span>
+                <span className="text-lg font-normal">∑</span>
+                <span>(w<sub>j</sub> × r<sub>ij</sub>)</span>
               </div>
-              <h3 className="font-display text-base font-bold text-slate-800">Deteksi Dinamis Hari Kerja Kalender</h3>
-            </div>
-            <div className="text-sm text-slate-600 leading-relaxed space-y-3">
-              <p>
-                Jumlah hari kerja efektif bervariasi setiap bulannya (misalnya Juni = 20 hari kerja). SENTER ASN tidak memaksa admin menginput hari kerja secara manual.
-              </p>
-              <p>
-                Sistem kami menggunakan algoritma statistik <strong>Modus (Nilai Terbanyak)</strong>. Sistem menjumlahkan semua kehadiran, cuti, dinas luar, dan alpa untuk setiap baris pegawai:
-              </p>
-              <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/50 text-xs font-semibold text-slate-500 space-y-1">
-                <div className="flex justify-between">
-                  <span>Pegawai A: Hadir (15) + Cuti (1) + DL (4)</span>
-                  <span className="text-teal-700 font-bold">= 20 Hari</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Pegawai B: Hadir Normal (20)</span>
-                  <span className="text-teal-700 font-bold">= 20 Hari</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Pegawai C: Hadir (18) + Alpa (2)</span>
-                  <span className="text-teal-700 font-bold">= 20 Hari</span>
-                </div>
-              </div>
-              <p>
-                Nilai penjumlahan terpopuler di antara ribuan baris data akan dideteksi sebagai jumlah Hari Kerja Kalender, lalu secara otomatis diuji dan diseragamkan ke seluruh OPD aktif.
-              </p>
+              <span className="text-[10px] text-slate-450 font-medium text-center">
+                Skor Akhir = (0.25 × C1) + (0.20 × C2) + (0.15 × C3) + (0.40 × C4)
+              </span>
             </div>
           </div>
-        </div>
 
-        {/* Card B: Intelligent Data Cleansing */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 space-y-4 shadow-sm flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-              <div className="p-2 rounded-lg bg-teal-50 text-teal-600">
-                <Database className="w-5 h-5" />
-              </div>
-              <h3 className="font-display text-base font-bold text-slate-800">Pembersihan Data Otomatis</h3>
-            </div>
-            <div className="text-sm text-slate-600 leading-relaxed space-y-3">
-              <p>
-                Sistem absensi instansi di lapangan sering menghasilkan berkas Excel yang kotor. SENTER ASN memiliki modul kecerdasan pembersihan data (*data cleansing*):
-              </p>
-              <ul className="space-y-2.5 pt-1">
-                <li className="flex items-start gap-2.5 text-xs font-semibold text-slate-700">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>Resolusi Typo NIP: Sistem mencocokkan secara fuzzy nama pegawai dengan database master jika terdeteksi kesalahan ketik NIP oleh admin.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-xs font-semibold text-slate-700">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>Konsolidasi Duplikasi OPD: Otomatis memetakan singkatan nama OPD yang tidak seragam (misal: PM &amp; PTSP terpotong) ke data resmi BKPSDM.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-xs font-semibold text-slate-700">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>Clean Overwrite Safeguard: Menghapus seluruh data mentah periode terkait sebelum ditimpa berkas revisi baru guna menghindari data yatim (*orphaned records*).</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      {/* ===== MENGAPA WEBSITE LEBIH AKURAT DIBANDINGKAN EXCEL? ===== */}
-      <div className="bg-amber-50/40 rounded-3xl border border-amber-200/80 p-6 md:p-8 space-y-6">
-        <div className="flex items-center gap-3 pb-3 border-b border-amber-200">
-          <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700">
-            <AlertTriangle className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-display text-lg font-bold text-slate-800">
-              Studi Kasus: Mengapa Nilai Excel Sering Salah &amp; Website Senter ASN Benar?
+          {/* Sub 2: Modus Hari Kerja */}
+          <div className="space-y-3 pt-2">
+            <h3 className="font-display text-base font-bold text-slate-800">
+              B. Deteksi Dinamis Hari Kerja Kalender (Statistik Modus)
             </h3>
-            <p className="text-xs text-amber-800 font-bold uppercase mt-0.5">
-              Fakta Integritas Data &amp; Truncation Error
+            <p>
+              Untuk memastikan keadilan perhitungan tanpa input manual, sistem secara otomatis mengkalkulasi jumlah hari kerja kalender menggunakan pendekatan statistik modus. Sistem menghitung akumulasi total baris kehadiran, dinas luar, cuti, dan izin sakit untuk setiap pegawai. Modus (nilai paling sering muncul) di antara ribuan baris data tersebut ditetapkan sebagai hari kerja dasar bulanan secara universal.
+            </p>
+          </div>
+
+          {/* Sub 3: Pembersihan Data */}
+          <div className="space-y-3 pt-2">
+            <h3 className="font-display text-base font-bold text-slate-800">
+              C. Pembersihan Data dan Penyelarasan Entitas
+            </h3>
+            <p>
+              Modul parsing file pada sistem secara aktif mendeteksi kesalahan ketik pada NIP pegawai dan melakukan pencocokan nama berbasis database master. Selain itu, sistem melakukan penyelarasan nama dinas (OPD) yang terpotong atau memiliki variasi penulisan sehingga data historis tersimpan secara konsisten.
             </p>
           </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-          <div className="space-y-3">
-            <h4 className="font-display font-extrabold text-slate-800 flex items-center gap-2">
-              <FileSpreadsheet className="w-4 h-4 text-red-600" /> Masalah Truncation di Formula Excel Admin
-            </h4>
-            <p className="text-slate-600 leading-relaxed">
-              Sebagian besar berkas absensi mentah instansi menggunakan template formula total Hadir Normal (HN) yang terkunci di baris ke-36: <code className="font-mono text-amber-850 bg-amber-100/50 px-1.5 py-0.5 rounded font-bold">=SUM(D2:D36)</code> (karena meniru batas jumlah pegawai BKPSDM).
-            </p>
-            <p className="text-slate-600 leading-relaxed font-semibold">
-              Akibatnya, dinas besar dengan pegawai &gt; 35 orang (seperti BPKPD yang memiliki 91 pegawai), data kehadiran seluruh pegawai dari baris 37 ke bawah terpotong dan TIDAK terhitung dalam total rekap manual Excel.
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-display font-extrabold text-slate-800 flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-600" /> Solusi Pengolahan Programmatik Website
-            </h4>
-            <p className="text-slate-600 leading-relaxed">
-              SENTER ASN secara cerdas <strong>mengabaikan baris rumus total di Excel</strong>. Sistem membaca data mentah baris demi baris per pegawai secara dinamis hingga akhir data.
-            </p>
-            <p className="text-slate-600 leading-relaxed font-semibold">
-              Kalkulasi agregat diolah di database secara transparan dan murni. Hal ini mencegah manipulasi nilai manual (<em>ditembak nilainya</em>) dan memastikan keadilan laporan kinerja OPD.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ===== TIM PENGEMBANG FOOTER ===== */}
-      <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-1.5 text-center md:text-left">
-          <h4 className="font-display font-extrabold text-slate-800 flex items-center justify-center md:justify-start gap-2">
-            <Code2 className="w-5 h-5 text-teal-600" /> Salam Hangat dari Tim Pengembang
-          </h4>
-          <p className="text-xs text-slate-500 font-semibold leading-relaxed max-w-xl">
-            Sistem SENTER ASN dibangun untuk menghadirkan akurasi penuh dan objektivitas data demi mewujudkan tata kelola kepegawaian Kabupaten Tana Toraja yang disiplin, bersih, dan berintegritas tinggi.
+      {/* ===== UCAPAN TERIMA KASIH ===== */}
+      <section className="space-y-4 pt-4 border-t border-slate-100">
+        <h2 className="font-display text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <span className="text-teal-600">05.</span> Ucapan Terima Kasih
+        </h2>
+        <div className="text-sm text-slate-600 leading-relaxed space-y-4">
+          <p>
+            Penyelesaian pengembangan platform <strong>SENTER ASN</strong> ini tidak terlepas dari bimbingan, arahan, dan kontribusi dari berbagai pihak yang menaruh perhatian tinggi terhadap peningkatan kualitas manajemen aparatur sipil negara di daerah.
+          </p>
+          <p>
+            Tim pengembang menyampaikan rasa terima kasih sebesar-besarnya kepada <strong>Badan Kepegawaian dan Pengembangan Sumber Daya Manusia (BKPSDM) Kabupaten Tana Toraja</strong> atas penyediaan data training, masukan parameter kebijakan evaluasi disiplin kerja, serta kesempatan uji coba sistem. Terima kasih pula kami haturkan kepada para administrator kepegawaian OPD atas kontribusinya dalam proses perbaikan kualitas berkas unggahan, serta rekan-rekan peneliti yang telah meluangkan waktu memberikan masukan metodologi ilmiah.
           </p>
         </div>
-        <div className="flex gap-4 shrink-0">
-          <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200 font-display text-center">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">Versi Sistem</span>
-            <span className="text-sm font-extrabold text-teal-800 mt-0.5 block">v2.0 (Stable)</span>
-          </div>
-          <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200 font-display text-center">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">Lisensi Data</span>
-            <span className="text-sm font-extrabold text-teal-800 mt-0.5 block">BKPSDM Tana Toraja</span>
-          </div>
-        </div>
+      </section>
+
+      {/* ===== CREDIT FOOTER ===== */}
+      <div className="pt-8 border-t border-slate-100 flex items-center justify-center gap-2 text-xs font-semibold text-slate-400">
+        <span>Dibuat dengan</span>
+        <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
+        <span>oleh Tim Pengembang SENTER ASN</span>
       </div>
     </div>
   );
