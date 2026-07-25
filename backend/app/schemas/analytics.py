@@ -61,6 +61,7 @@ class PresensiRowAggr:
     cb: int = 0
     cm: int = 0
     ckap: int = 0
+    idl: int = 0
 
     @property
     def total_hadir(self) -> int:

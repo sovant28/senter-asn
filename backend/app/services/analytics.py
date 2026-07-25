@@ -21,7 +21,7 @@ BOBOT_HADIR_EFEKTIF = 0.40
 KATEGORI_SANGAT_DISIPLIN = "SANGAT_DISIPLIN"
 KATEGORI_DISIPLIN = "DISIPLIN"
 KATEGORI_CUKUP = "CUKUP"
-KATEGORI_KURANG = "KURANG"
+KATEGORI_PERLU_PEMBINAAN = "PERLU_PEMBINAAN"
 
 DEFAULT_HARI_KERJA = 22
 
@@ -40,8 +40,8 @@ def hitung_counter_agregat(
 
     jumlah_terlambat = sum(r.tm1 + r.tm2 + r.tm3 + r.tmm + r.itm for r in rows)
     jumlah_pulang_cepat = sum(r.pc1 + r.pc2 + r.pc3 + r.pcm + r.ipc for r in rows)
-    jumlah_hadir_normal = sum(r.hn + r.dl + r.ct + r.cs + r.cb + r.cm + r.ckap for r in rows)
-    jumlah_tidak_hadir = sum(r.tk + r.itmpc + r.tb for r in rows)
+    jumlah_hadir_normal = sum(r.hn + r.dl + r.ct + r.cs + r.cb + r.cm + r.ckap + r.idl for r in rows)
+    jumlah_tidak_hadir = sum(r.tk + r.itmpc for r in rows)
     jumlah_hadir = total_kewajiban - jumlah_tidak_hadir
 
     return AgregatCounter(
@@ -108,7 +108,7 @@ def tentukan_kategori(total_skor: float) -> str:
         return KATEGORI_DISIPLIN
     if total_skor >= 70:
         return KATEGORI_CUKUP
-    return KATEGORI_KURANG
+    return KATEGORI_PERLU_PEMBINAAN
 
 
 class AnalyticsService:
@@ -138,7 +138,10 @@ class AnalyticsService:
             """),
             {"tahun": tahun, "bulan": bulan, "default_hari_kerja": DEFAULT_HARI_KERJA},
         )
-        opd_hari_kerja = {row.opd_id: row.mode_days for row in result_hari_kerja.all()}
+        all_rows = result_hari_kerja.all()
+        all_mode_days = [row.mode_days for row in all_rows]
+        # Use the maximum mode days as the uniform calendar working days for this period
+        uniform_hari_kerja = max(all_mode_days) if all_mode_days else DEFAULT_HARI_KERJA
 
         # Delete existing aggregates for this period (clean recalculation slate)
         await self.session.execute(
@@ -156,8 +159,7 @@ class AnalyticsService:
             if not rows:
                 continue
 
-            hari_kerja = opd_hari_kerja.get(opd.id, DEFAULT_HARI_KERJA)
-            counter = hitung_counter_agregat(rows, hari_kerja)
+            counter = hitung_counter_agregat(rows, uniform_hari_kerja)
             if counter.total_kewajiban_hadir == 0:
                 continue
 
@@ -262,6 +264,7 @@ class AnalyticsService:
                 PresensiRaw.cb,
                 PresensiRaw.cm,
                 PresensiRaw.ckap,
+                PresensiRaw.idl,
             )
             .join(Pegawai, PresensiRaw.pegawai_id == Pegawai.id)
             .where(
@@ -295,6 +298,7 @@ class AnalyticsService:
                 cb=row.cb or 0,
                 cm=row.cm or 0,
                 ckap=row.ckap or 0,
+                idl=row.idl or 0,
             )
             for row in result
         ]
