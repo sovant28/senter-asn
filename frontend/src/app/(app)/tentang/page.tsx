@@ -141,7 +141,15 @@ export default function TentangSistemPage() {
         <div className="bg-slate-50/50 rounded-2xl border border-slate-200/60 p-5 space-y-4">
           <h4 className="font-bold text-slate-800 text-sm">A. Pemodelan Evaluasi dengan Simple Additive Weighting (SAW)</h4>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Penentuan nilai disiplin akhir OPD menggunakan metode <strong>Simple Additive Weighting (SAW)</strong>, yaitu mencari penjumlahan terbobot dari rating kinerja alternatif pada seluruh kriteria penilaian benefit. Sistem mengevaluasi empat kriteria utama:
+            Penentuan nilai disiplin akhir OPD menggunakan metode <strong>Simple Additive Weighting (SAW)</strong>, yaitu mencari penjumlahan terbobot dari rating kinerja alternatif pada seluruh kriteria penilaian benefit.
+          </p>
+
+          <div className="bg-slate-100/50 p-4 rounded-xl border border-slate-200/60 text-slate-850 text-center font-mono text-sm">
+            {"\\( V_i = \\sum_{j=1}^{n} w_j r_{ij} \\)"}
+          </div>
+
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Sistem mengevaluasi empat kriteria utama:
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
@@ -220,6 +228,13 @@ export default function TentangSistemPage() {
             Tim pengembang menyampaikan rasa terima kasih sebesar-besarnya kepada <strong>Badan Kepegawaian dan Pengembangan Sumber Daya Manusia (BKPSDM) Kabupaten Tana Toraja</strong> atas penyediaan data training, masukan parameter kebijakan evaluasi disiplin kerja, serta kesempatan uji coba sistem. Terima kasih pula kami haturkan kepada para administrator kepegawaian OPD atas kontribusinya dalam proses perbaikan kualitas berkas unggahan, serta rekan-rekan peneliti yang telah meluangkan waktu memberikan masukan metodologi ilmiah.
           </p>
         </div>
+      </div>
+
+      {/* ===== CREDIT FOOTER ===== */}
+      <div className="pt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400">
+        <span>Dibuat dengan</span>
+        <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
+        <span>oleh Tim Pengembang SENTER ASN</span>
       </div>
     </div>
   );
