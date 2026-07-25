@@ -151,6 +151,29 @@ export default function TentangSistemPage() {
             <span className="font-extrabold text-base md:text-lg">(w<sub>j</sub> × r<sub>ij</sub>)</span>
           </div>
 
+          {/* Keterangan Notasi Matematika */}
+          <div className="bg-slate-50/80 rounded-xl border border-slate-200/50 p-4 space-y-2 text-xs">
+            <span className="font-bold text-slate-700 block">Keterangan Notasi:</span>
+            <div className="space-y-1.5 text-slate-600 leading-relaxed pl-1 font-medium">
+              <div className="flex gap-2">
+                <span className="font-bold text-slate-800 shrink-0 w-8">V<sub>i</sub></span>
+                <span>: Hasil preferensi akhir atau total skor kedisiplinan OPD ke-i.</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-slate-800 shrink-0 w-8">w<sub>j</sub></span>
+                <span>: Bobot kepentingan kriteria ke-j (yaitu C1 = 25%, C2 = 20%, C3 = 15%, C4 = 40%).</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-slate-800 shrink-0 w-8">r<sub>ij</sub></span>
+                <span>: Rating kinerja atau persentase murni OPD ke-i pada kriteria ke-j.</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-slate-800 shrink-0 w-8">∑</span>
+                <span>: Simbol penjumlahan untuk mengakumulasikan seluruh perkalian bobot dengan nilai kriteria.</span>
+              </div>
+            </div>
+          </div>
+
           <p className="text-xs text-slate-500 leading-relaxed">
             Sistem mengevaluasi empat kriteria utama:
           </p>
