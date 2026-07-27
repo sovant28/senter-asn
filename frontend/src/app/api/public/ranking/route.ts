@@ -61,11 +61,31 @@ export async function GET(request: Request) {
       ...row,
       total_skor: parseFloat(row.total_skor || "0"),
     }));
+
+    // Fetch monthly average trend
+    const trendQuery = `
+      SELECT 
+        presensi.presensi_agregat_opd.tahun,
+        presensi.presensi_agregat_opd.bulan,
+        ROUND(AVG(presensi.presensi_agregat_opd.total_skor)::numeric, 2)::float AS avg_skor
+      FROM 
+        presensi.presensi_agregat_opd
+      JOIN 
+        master.opd ON presensi.presensi_agregat_opd.opd_id = opd.id
+      WHERE 
+        opd.is_active = TRUE
+      GROUP BY 
+        presensi.presensi_agregat_opd.tahun, presensi.presensi_agregat_opd.bulan
+      ORDER BY 
+        presensi.presensi_agregat_opd.tahun ASC, presensi.presensi_agregat_opd.bulan ASC;
+    `;
+    const trendResult = await client.query(trendQuery);
     
     return NextResponse.json({
       periode: { tahun, bulan },
       opd_count: rankings.length,
       rankings: rankings,
+      trend: trendResult.rows,
     });
   } catch (error) {
     console.error("Database query error in route handler:", error);
