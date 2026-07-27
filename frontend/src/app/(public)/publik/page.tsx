@@ -598,18 +598,7 @@ export default function PublicDashboardPage() {
             </div>
           </div>
 
-          {/* METHODOLOGY INFO BOX */}
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col md:flex-row gap-4 items-start">
-            <div className="p-2 rounded-xl bg-teal-50 text-teal-600 shrink-0">
-              <Info className="w-5 h-5" />
-            </div>
-            <div className="space-y-1.5 text-xs text-slate-500 leading-relaxed font-medium">
-              <h4 className="font-bold text-slate-800 text-sm">Metodologi & Standardisasi Penilaian</h4>
-              <p>
-                Nilai kedisiplinan OPD dihitung secara terpusat menggunakan metode <strong>Simple Additive Weighting (SAW)</strong> dengan mengevaluasi empat kriteria utama: Persentase Kehadiran Fisik (bobot 25%), Kepatuhan Jam Kerja (bobot 20%), Tingkat Ketidakhadiran Tanpa Alasan (bobot 15%), dan Persentase Hadir Kerja Efektif (bobot 40%). Perhitungan hari kerja dinamis disesuaikan per periode menggunakan statistik modus kalender. Hal ini menjamin transparansi serta objektivitas evaluasi kinerja tanpa manipulasi manual.
-              </p>
-            </div>
-          </div>
+
         </>
       )}
     </div>

@@ -1,9 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth";
-import { fetchRanking, fetchOpdDetail } from "@/lib/api";
+import React, { useEffect, useState } from "react";
 import {
   BookOpen,
   HelpCircle,
@@ -39,8 +36,6 @@ interface OpdDetail {
   ranking: { total_skor: number; kehadiran: number; pelanggaran: number };
 }
 
-const HARI_KERJA = 22;
-
 const katLabel = (kat: string) =>
   ({
     SANGAT_DISIPLIN: "Sangat Disiplin",
@@ -58,65 +53,87 @@ const katBadge = (kat: string) =>
   }[kat] || "bg-slate-50 text-slate-600 border-slate-200");
 
 export default function PerhitunganPage() {
-  const { user, loading: authLoading } = useAuth();
   const [rankings, setRankings] = useState<Ranking[]>([]);
   const [selectedOpd, setSelectedOpd] = useState<number | null>(null);
   const [detail, setDetail] = useState<OpdDetail | null>(null);
-  const [tahun, setTahun] = useState(2026);
-  const [bulan, setBulan] = useState(5);
+
+  // Default to the previous month's calendar period
+  const [tahun, setTahun] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d.getFullYear();
+  });
+  const [bulan, setBulan] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d.getMonth() + 1;
+  });
+
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [showCorrection, setShowCorrection] = useState(false);
   const [correctionStep, setCorrectionStep] = useState("");
   const [correctionText, setCorrectionText] = useState("");
-  const router = useRouter();
 
-  // Handle Authentication and fetch Ranking list
+  // Fetch rankings list dynamically
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
-      return;
-    }
-    if (user) {
-      const timer = setTimeout(() => {
-        setLoading(true);
-        fetchRanking(tahun, bulan)
-          .then((d) => {
-            const list = d.rankings || [];
-            setRankings(list);
-            if (list.length > 0) {
-              setSelectedOpd((prev) => {
-                if (prev && list.some((r: Ranking) => r.opd_id === prev)) return prev;
-                return list[0].opd_id;
-              });
-            }
-          })
-          .catch(console.error)
-          .finally(() => setLoading(false));
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [user, authLoading, router, tahun, bulan]);
+    setLoading(true);
+    fetch(`/api/public/ranking?tahun=${tahun}&bulan=${bulan}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load rankings");
+        return res.json();
+      })
+      .then((d) => {
+        const list = d.rankings || [];
+        setRankings(list);
+        if (list.length > 0) {
+          setSelectedOpd((prev) => {
+            if (prev && list.some((r: Ranking) => r.opd_id === prev)) return prev;
+            return list[0].opd_id;
+          });
+        } else {
+          setSelectedOpd(null);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setRankings([]);
+        setSelectedOpd(null);
+      })
+      .finally(() => setLoading(false));
+  }, [tahun, bulan]);
 
   // Fetch detailed information for the selected OPD
   useEffect(() => {
     if (selectedOpd) {
-      const timer = setTimeout(() => {
-        setDetailLoading(true);
-        setDetail(null);
-        fetchOpdDetail(selectedOpd, tahun, bulan)
-          .then(setDetail)
-          .catch(console.error)
-          .finally(() => setDetailLoading(false));
-      }, 0);
-      return () => clearTimeout(timer);
+      setDetailLoading(true);
+      setDetail(null);
+      fetch(`/api/public/opd-detail?opd_id=${selectedOpd}&tahun=${tahun}&bulan=${bulan}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to load OPD detail");
+          return res.json();
+        })
+        .then((d) => {
+          setDetail(d);
+        })
+        .catch((err) => {
+          console.error(err);
+          setDetail(null);
+        })
+        .finally(() => setDetailLoading(false));
+    } else {
+      setDetail(null);
     }
   }, [selectedOpd, tahun, bulan]);
 
-  if (authLoading || loading) {
-    return <div className="flex items-center justify-center min-h-screen text-slate-400 font-semibold text-sm">Memuat...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh] text-slate-400 font-semibold text-sm">
+        <div className="w-8 h-8 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mr-3"></div>
+        Memuat simulator perhitungan...
+      </div>
+    );
   }
-  if (!user) return null;
 
   const bulanNames = [
     "",
@@ -133,8 +150,6 @@ export default function PerhitunganPage() {
     "November",
     "Desember",
   ];
-
-  const selectedRanking = rankings.find((r) => r.opd_id === selectedOpd);
 
   return (
     <div className="space-y-8 w-full">
@@ -299,7 +314,7 @@ export default function PerhitunganPage() {
           </div>
           <div>
             <h3 className="font-display text-base font-bold text-slate-800">Simulator Kasus OPD</h3>
-            <p className="text-xs text-slate-400 font-semibold">Gunakan simulator ini untuk membedah skor dan menanggapi protes Kepala OPD.</p>
+            <p className="text-xs text-slate-400 font-semibold">Gunakan simulator ini untuk membedah skor dan melihat detail kinerja seluruh OPD.</p>
           </div>
         </div>
 
@@ -311,7 +326,7 @@ export default function PerhitunganPage() {
               <select
                 value={tahun}
                 onChange={(e) => setTahun(Number(e.target.value))}
-                className="w-full text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-primary"
+                className="w-full text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
               >
                 {[2024, 2025, 2026].map((y) => (
                   <option key={y} value={y}>{y}</option>
@@ -323,7 +338,7 @@ export default function PerhitunganPage() {
               <select
                 value={bulan}
                 onChange={(e) => setBulan(Number(e.target.value))}
-                className="w-full text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-primary"
+                className="w-full text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
               >
                 {bulanNames.slice(1).map((name, i) => (
                   <option key={i} value={i + 1}>{name}</option>
@@ -335,7 +350,7 @@ export default function PerhitunganPage() {
               <select
                 value={selectedOpd || ""}
                 onChange={(e) => setSelectedOpd(Number(e.target.value))}
-                className="w-full text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-primary"
+                className="w-full text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
               >
                 {rankings.map((r) => (
                   <option key={r.opd_id} value={r.opd_id}>
@@ -350,12 +365,18 @@ export default function PerhitunganPage() {
         {/* Simulation Steps Output */}
         {detailLoading && (
           <div className="text-center py-12 text-slate-400 text-sm font-medium">
-            <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-3" />
-            Mengkalkulasi ulang data presensi...
+            <div className="w-6 h-6 border-2 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-3" />
+            Mengkalkulasi data presensi...
           </div>
         )}
 
-        {detail && selectedRanking && (
+        {!detailLoading && rankings.length === 0 && (
+          <div className="text-center py-8 text-slate-400 text-xs font-semibold">
+            Belum ada data rekapitulasi untuk periode yang dipilih.
+          </div>
+        )}
+
+        {detail && (
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 rounded-2xl border border-slate-200/60 bg-slate-50/50">
               <div>
@@ -401,7 +422,7 @@ export default function PerhitunganPage() {
                 <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">3</div>
                 <div className="space-y-2 w-full">
                   <span className="text-xs font-bold text-slate-400 block">Nilai Persentase Murni</span>
-                  <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 space-y-3.5 text-slate-650 font-medium">
+                  <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 space-y-3.5 text-slate-600 font-medium">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5">
                       <span>Persentase Kehadiran:</span>
                       <span className="text-slate-800">({detail.counter.jumlah_hadir} / {detail.counter.total_kewajiban_hadir}) x 100% = <span className="font-bold">{detail.persentase.kehadiran.toFixed(2)}%</span></span>
@@ -427,12 +448,12 @@ export default function PerhitunganPage() {
                 <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">4</div>
                 <div className="space-y-2 w-full">
                   <span className="text-xs font-bold text-slate-400 block">Kalkulasi Bobot & Skor Akhir</span>
-                  <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 space-y-2.5 text-slate-600 font-medium">
+                  <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 space-y-2.5 text-slate-650 font-medium">
                     <div className="flex justify-between"><span>Kehadiran (25%):</span> <span>{detail.persentase.kehadiran.toFixed(2)} x 0.25 = {detail.skor.kehadiran.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>Kepatuhan Jam (20%):</span> <span>(100 - {detail.persentase.pelanggaran.toFixed(2)}) x 0.20 = {detail.skor.kepatuhan_jam_kerja.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>Absensi (15%):</span> <span>(100 - {detail.persentase.ketidakhadiran.toFixed(2)}) x 0.15 = {detail.skor.ketidakhadiran.toFixed(2)}</span></div>
                     <div className="flex justify-between font-semibold text-teal-800"><span>Hadir Efektif (40%):</span> <span>{detail.persentase.hadir_efektif.toFixed(2)} x 0.40 = {detail.skor.hadir_efektif.toFixed(2)}</span></div>
-                    <div className="flex justify-between font-bold text-slate-850 border-t border-slate-200 pt-3 mt-3 text-sm">
+                    <div className="flex justify-between font-bold text-slate-800 border-t border-slate-200 pt-3 mt-3 text-sm">
                       <span>Total Skor Akhir:</span>
                       <span className="text-teal-700 text-lg font-extrabold">{detail.skor.total.toFixed(2)}</span>
                     </div>
@@ -444,7 +465,7 @@ export default function PerhitunganPage() {
         )}
       </div>
 
-      {/* ===== SECTION 4: KOREKSI / UMPAN BALIK FORM (DI PALING BAWAH) ===== */}
+      {/* ===== SECTION 4: KOREKSI / UMPAN BALIK FORM ===== */}
       <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden">
         <button
           onClick={() => {
@@ -474,7 +495,7 @@ export default function PerhitunganPage() {
                 <select
                   value={correctionStep}
                   onChange={(e) => setCorrectionStep(e.target.value)}
-                  className="w-full text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-primary"
+                  className="w-full text-sm font-semibold px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                 >
                   <option value="">— Pilih langkah —</option>
                   <option value="kewajiban">1. Total Kewajiban Hadir</option>
@@ -491,7 +512,7 @@ export default function PerhitunganPage() {
                 value={correctionText}
                 onChange={(e) => setCorrectionText(e.target.value)}
                 placeholder="Contoh: Selama masa libur lebaran, jumlah hari kerja K diubah dari 22 menjadi 18 hari..."
-                className="w-full text-sm px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-primary resize-y"
+                className="w-full text-sm px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-y"
               />
             </div>
             <div className="flex gap-2 justify-end">
@@ -505,7 +526,7 @@ export default function PerhitunganPage() {
               >
                 Batal
               </button>
-              <button className="px-4 py-2.5 text-sm font-bold text-white bg-primary-dark rounded-xl hover:bg-primary transition-colors flex items-center gap-1.5">
+              <button className="px-4 py-2.5 text-sm font-bold text-white bg-teal-800 rounded-xl hover:bg-teal-700 transition-colors flex items-center gap-1.5">
                 Kirim Pengajuan <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

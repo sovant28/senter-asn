@@ -32,6 +32,16 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               Dashboard
             </Link>
             <Link
+              href="/perhitungan"
+              className={`transition-colors duration-200 ${
+                pathname === "/perhitungan"
+                  ? "text-teal-700"
+                  : "text-slate-500 hover:text-teal-600"
+              }`}
+            >
+              Simulator Perhitungan
+            </Link>
+            <Link
               href="/tentang"
               className={`transition-colors duration-200 ${
                 pathname === "/tentang"
