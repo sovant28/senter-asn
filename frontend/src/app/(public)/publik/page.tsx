@@ -496,27 +496,6 @@ export default function PublicDashboardPage() {
               <div className="flex-grow h-[220px] w-full relative">
                 <ReactECharts option={donutOption} style={{ height: "100%", width: "100%" }} />
               </div>
-              {/* Summary Highlight Box */}
-              <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-3 space-y-2 text-xs">
-                {bestOPD && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-yellow-500" /> Terbaik #1
-                    </span>
-                    <strong className="text-emerald-700 max-w-[150px] truncate">{bestOPD.nama_opd}</strong>
-                    <span className="font-bold text-slate-700">{bestOPD.total_skor.toFixed(2)}</span>
-                  </div>
-                )}
-                {worstOPD && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400 font-semibold flex items-center gap-1">
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-500" /> Terbawah #1
-                    </span>
-                    <strong className="text-red-700 max-w-[150px] truncate">{worstOPD.nama_opd}</strong>
-                    <span className="font-bold text-slate-700">{worstOPD.total_skor.toFixed(2)}</span>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
