@@ -238,12 +238,8 @@ export default function PublicDashboardPage() {
 
   const BULAN_NAMES = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
 
-  // Provide realistic baseline trend points if database only contains one month of data
-  const displayTrend = trendData.length > 1 ? trendData : [
-    { tahun: 2026, bulan: 4, avg_skor: 68.45 },
-    { tahun: 2026, bulan: 5, avg_skor: 70.12 },
-    { tahun: 2026, bulan: 6, avg_skor: avgSkor },
-  ];
+  // Display only real calculated trend data from the database
+  const displayTrend = trendData;
 
   const lineOption = {
     tooltip: {
