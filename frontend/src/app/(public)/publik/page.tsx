@@ -42,14 +42,30 @@ const BULAN_LIST = [
   { value: 12, label: "Desember" },
 ];
 
-const TAHUN_LIST = [2024, 2025, 2026];
+// Generate the selectable years dynamically: from 2024 up to the current calendar year
+const TAHUN_LIST: number[] = [];
+const currentCalYear = new Date().getFullYear();
+for (let y = 2024; y <= Math.max(currentCalYear, 2026); y++) {
+  TAHUN_LIST.push(y);
+}
 
 export default function PublicDashboardPage() {
   const [rankings, setRankings] = useState<Ranking[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedYear, setSelectedYear] = useState(2026);
-  const [selectedMonth, setSelectedMonth] = useState(6);
+
+  // Default to the previous month's calendar period (since recaps are completed monthly)
+  const [selectedYear, setSelectedYear] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d.getFullYear();
+  });
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d.getMonth() + 1;
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
