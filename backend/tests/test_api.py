@@ -38,6 +38,24 @@ class TestPresensiUpload:
         )
         assert resp.status_code == 401
 
+    def test_upload_invalid_magic_bytes(self, client):
+        from app.middleware.auth import get_current_user
+        from app.models.master import User
+
+        mock_user = User(id=1, username="test_admin", role="SUPER_ADMIN", is_active=True)
+        app.dependency_overrides[get_current_user] = lambda: mock_user
+
+        try:
+            f = io.BytesIO(b"not xlsx")
+            resp = client.post(
+                "/api/presensi/upload",
+                files={"file": ("test.xlsx", f, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
+            )
+            assert resp.status_code == 400
+            assert "File signature does not match .xlsx format." in resp.json()["detail"]
+        finally:
+            app.dependency_overrides.clear()
+
 
 class TestAnalytics:
     def test_opd_ranking_no_auth(self, client):
@@ -90,3 +108,29 @@ class TestCORS:
         )
         assert resp.status_code == 200
         assert "access-control-allow-origin" in resp.headers
+
+
+class TestPublicAPI:
+    def test_public_opd_ranking_no_auth(self, client):
+        from unittest.mock import patch, AsyncMock
+        from app.api.deps import get_db
+
+        mock_repo = AsyncMock()
+        mock_repo.get_opd_ranking.return_value = [
+            {"ranking": 1, "id": 10, "nama_opd": "Dinas Test", "kode_opd": "OPD_0010", "total_skor": 95.5, "kategori": "SANGAT_DISIPLIN"}
+        ]
+
+        app.dependency_overrides[get_db] = lambda: AsyncMock()
+
+        with patch("app.api.public.PresensiRepository", return_value=mock_repo):
+            try:
+                resp = client.get("/api/public/ranking?tahun=2026&bulan=5")
+                assert resp.status_code == 200
+                data = resp.json()
+                assert data["periode"] == {"tahun": 2026, "bulan": 5}
+                assert data["opd_count"] == 1
+                assert len(data["rankings"]) == 1
+                assert data["rankings"][0]["nama_opd"] == "Dinas Test"
+                assert data["rankings"][0]["total_skor"] == 95.5
+            finally:
+                app.dependency_overrides.clear()

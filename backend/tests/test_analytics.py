@@ -9,7 +9,7 @@ from app.services.analytics import (
     KATEGORI_SANGAT_DISIPLIN,
     KATEGORI_DISIPLIN,
     KATEGORI_CUKUP,
-    KATEGORI_KURANG,
+    KATEGORI_PERLU_PEMBINAAN,
 )
 
 
@@ -206,9 +206,9 @@ class TestTentukanKategori:
         (79.9, KATEGORI_CUKUP),
         (75.0, KATEGORI_CUKUP),
         (70.0, KATEGORI_CUKUP),
-        (69.9, KATEGORI_KURANG),
-        (50.0, KATEGORI_KURANG),
-        (0.0, KATEGORI_KURANG),
+        (69.9, KATEGORI_PERLU_PEMBINAAN),
+        (50.0, KATEGORI_PERLU_PEMBINAAN),
+        (0.0, KATEGORI_PERLU_PEMBINAAN),
     ])
     def test_all_thresholds(self, skor, expected):
         assert tentukan_kategori(skor) == expected
@@ -239,5 +239,5 @@ class TestEndToEnd:
             KATEGORI_SANGAT_DISIPLIN,
             KATEGORI_DISIPLIN,
             KATEGORI_CUKUP,
-            KATEGORI_KURANG,
+            KATEGORI_PERLU_PEMBINAAN,
         )

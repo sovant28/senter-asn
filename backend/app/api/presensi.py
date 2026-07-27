@@ -25,171 +25,184 @@ async def upload_presensi(
     if not file.filename or not file.filename.endswith(".xlsx"):
         raise HTTPException(400, "Only .xlsx files are accepted")
 
-    dest = await save_upload_file(file)
-
+    dest = None
     try:
+        # Read first 4 bytes to check magic signature (ZIP signature for .xlsx)
+        magic_bytes = await file.read(4)
+        await file.seek(0)
+        if magic_bytes != b"PK\x03\x04":
+            raise HTTPException(400, "Invalid file format. File signature does not match .xlsx format.")
+
+        dest = await save_upload_file(file)
+
         parser = ExcelPresensiParser()
         result = parser.parse(dest)
-    except (ValueError, FileNotFoundError) as e:
-        raise HTTPException(400, str(e))
 
-    upload_log = UploadLog(
-        uploaded_by=current_user.id,
-        file_hash_sha256=result.metadata.file_hash,
-        file_size_bytes=result.metadata.file_size_bytes,
-        file_name_original=file.filename or "unknown.xlsx",
-        rows_imported=result.metadata.success_rows,
-        rows_rejected=result.metadata.error_rows,
-        rejection_reasons={e.row_number: e.reason for e in result.errors} if result.errors else None,
-        status="SUCCESS" if result.success else "PARTIAL",
-        tahun=result.rows[0].tahun if result.rows else None,
-        bulan=result.rows[0].bulan if result.rows else None,
-        started_at=datetime.now(timezone.utc),
-        finished_at=datetime.now(timezone.utc),
-    )
-    db.add(upload_log)
-    await db.flush()
+        upload_log = UploadLog(
+            uploaded_by=current_user.id,
+            file_hash_sha256=result.metadata.file_hash,
+            file_size_bytes=result.metadata.file_size_bytes,
+            file_name_original=file.filename or "unknown.xlsx",
+            rows_imported=result.metadata.success_rows,
+            rows_rejected=result.metadata.error_rows,
+            rejection_reasons={e.row_number: e.reason for e in result.errors} if result.errors else None,
+            status="SUCCESS" if result.success else "PARTIAL",
+            tahun=result.rows[0].tahun if result.rows else None,
+            bulan=result.rows[0].bulan if result.rows else None,
+            started_at=datetime.now(timezone.utc),
+            finished_at=datetime.now(timezone.utc),
+        )
+        db.add(upload_log)
+        await db.flush()
 
-    # --- Auto-import OPD from UNIT KERJA column (bulk) ---
-    unit_names = sorted({r.unit_kerja.strip() for r in result.rows if r.unit_kerja})
-    existing_opd_rows = (await db.execute(
-        select(OPD.nama_opd, OPD.id, OPD.kode_opd).where(OPD.nama_opd.in_(unit_names))
-    )).all()
-    opd_by_name: dict[str, tuple[int, str]] = {}
-    existing_kodes: set[str] = set()
-    for r in existing_opd_rows:
-        opd_by_name[r.nama_opd] = (r.id, r.kode_opd)
-        existing_kodes.add(r.kode_opd)
+        # --- Auto-import OPD from UNIT KERJA column (bulk) ---
+        unit_names = sorted({r.unit_kerja.strip() for r in result.rows if r.unit_kerja})
+        existing_opd_rows = (await db.execute(
+            select(OPD.nama_opd, OPD.id, OPD.kode_opd).where(OPD.nama_opd.in_(unit_names))
+        )).all()
+        opd_by_name: dict[str, tuple[int, str]] = {}
+        existing_kodes: set[str] = set()
+        for r in existing_opd_rows:
+            opd_by_name[r.nama_opd] = (r.id, r.kode_opd)
+            existing_kodes.add(r.kode_opd)
 
-    new_opds: list[OPD] = []
-    max_id_result = await db.execute(select(func.max(OPD.id)))
-    max_id = max_id_result.scalar() or 0
-    counter = max_id + 1
-    for nama in unit_names:
-        if nama in opd_by_name:
-            continue
-        counter += 1
-        kode = f"OPD_{counter:04d}"
-        while kode in existing_kodes:
+        new_opds: list[OPD] = []
+        max_id_result = await db.execute(select(func.max(OPD.id)))
+        max_id = max_id_result.scalar() or 0
+        counter = max_id + 1
+        for nama in unit_names:
+            if nama in opd_by_name:
+                continue
             counter += 1
             kode = f"OPD_{counter:04d}"
-        existing_kodes.add(kode)
-        new_opds.append(OPD(kode_opd=kode, nama_opd=nama, tipe_opd="DINAS"))
+            while kode in existing_kodes:
+                counter += 1
+                kode = f"OPD_{counter:04d}"
+            existing_kodes.add(kode)
+            new_opds.append(OPD(kode_opd=kode, nama_opd=nama, tipe_opd="DINAS"))
 
-    if new_opds:
-        db.add_all(new_opds)
-        await db.flush()
-        for o in new_opds:
-            opd_by_name[o.nama_opd] = (o.id, o.kode_opd)
+        if new_opds:
+            db.add_all(new_opds)
+            await db.flush()
+            for o in new_opds:
+                opd_by_name[o.nama_opd] = (o.id, o.kode_opd)
 
-    # --- Auto-import Pegawai (bulk) ---
-    nips_seen: set[str] = set()
-    new_pegawai_list: list[dict] = []
-    for r in result.rows:
-        if not r.nip or not r.unit_kerja:
-            continue
-        nip = r.nip.strip()
-        if nip in nips_seen:
-            continue
-        nips_seen.add(nip)
-        unit = r.unit_kerja.strip()
-        new_pegawai_list.append({"nip": nip, "nama": r.nama.strip()[:200], "unit": unit})
+        # --- Auto-import Pegawai (bulk) ---
+        nips_seen: set[str] = set()
+        new_pegawai_list: list[dict] = []
+        for r in result.rows:
+            if not r.nip or not r.unit_kerja:
+                continue
+            nip = r.nip.strip()
+            if nip in nips_seen:
+                continue
+            nips_seen.add(nip)
+            unit = r.unit_kerja.strip()
+            new_pegawai_list.append({"nip": nip, "nama": r.nama.strip()[:200], "unit": unit})
 
-    all_nips = [p["nip"] for p in new_pegawai_list]
-    existing_pegs = (await db.execute(
-        select(Pegawai).where(Pegawai.nip.in_(all_nips))
-    )).scalars().all()
-    existing_peg_dict = {p.nip: p for p in existing_pegs}
-    existing_peg_nips = {p.nip: p.id for p in existing_pegs}
+        all_nips = [p["nip"] for p in new_pegawai_list]
+        existing_pegs = (await db.execute(
+            select(Pegawai).where(Pegawai.nip.in_(all_nips))
+        )).scalars().all()
+        existing_peg_dict = {p.nip: p for p in existing_pegs}
+        existing_peg_nips = {p.nip: p.id for p in existing_pegs}
 
-    new_pegs: list[Pegawai] = []
-    for p in new_pegawai_list:
-        opd_entry = opd_by_name.get(p["unit"])
-        if not opd_entry:
-            continue
-        opd_id = opd_entry[0]
+        new_pegs: list[Pegawai] = []
+        for p in new_pegawai_list:
+            opd_entry = opd_by_name.get(p["unit"])
+            if not opd_entry:
+                continue
+            opd_id = opd_entry[0]
 
-        if p["nip"] in existing_peg_dict:
-            peg_obj = existing_peg_dict[p["nip"]]
-            # Update department if it has changed (Mutation)
-            if peg_obj.opd_id != opd_id:
-                peg_obj.opd_id = opd_id
-                peg_obj.nama = p["nama"]
-            continue
+            if p["nip"] in existing_peg_dict:
+                peg_obj = existing_peg_dict[p["nip"]]
+                # Update department if it has changed (Mutation)
+                if peg_obj.opd_id != opd_id:
+                    peg_obj.opd_id = opd_id
+                    peg_obj.nama = p["nama"]
+                continue
 
-        new_pegs.append(Pegawai(nip=p["nip"], nama=p["nama"], opd_id=opd_id, jenis_asn="PNS"))
+            new_pegs.append(Pegawai(nip=p["nip"], nama=p["nama"], opd_id=opd_id, jenis_asn="PNS"))
 
-    if new_pegs:
-        db.add_all(new_pegs)
-        await db.flush()
-        for pe in new_pegs:
-            existing_peg_nips[pe.nip] = pe.id
+        if new_pegs:
+            db.add_all(new_pegs)
+            await db.flush()
+            for pe in new_pegs:
+                existing_peg_nips[pe.nip] = pe.id
 
-    # --- Write presensi rows (Clean overwrite for the uploaded OPDs and period) ---
-    if result.rows:
-        target_tahun = result.rows[0].tahun
-        target_bulan = result.rows[0].bulan
-        opd_ids = [opd_by_name[name][0] for name in unit_names if name in opd_by_name]
-        if opd_ids:
-            await db.execute(
-                delete(PresensiRaw).where(
-                    PresensiRaw.tahun == target_tahun,
-                    PresensiRaw.bulan == target_bulan,
-                    PresensiRaw.pegawai_id.in_(
-                        select(Pegawai.id).where(Pegawai.opd_id.in_(opd_ids))
-                    ),
+        # --- Write presensi rows (Clean overwrite for the uploaded OPDs and period) ---
+        if result.rows:
+            target_tahun = result.rows[0].tahun
+            target_bulan = result.rows[0].bulan
+            opd_ids = [opd_by_name[name][0] for name in unit_names if name in opd_by_name]
+            if opd_ids:
+                await db.execute(
+                    delete(PresensiRaw).where(
+                        PresensiRaw.tahun == target_tahun,
+                        PresensiRaw.bulan == target_bulan,
+                        PresensiRaw.pegawai_id.in_(
+                            select(Pegawai.id).where(Pegawai.opd_id.in_(opd_ids))
+                        ),
+                    )
                 )
+
+        missing_nips = 0
+        for row in result.rows:
+            pegawai_id = existing_peg_nips.get(row.nip.strip()) if row.nip else None
+            if pegawai_id is None:
+                missing_nips += 1
+                continue
+            raw = PresensiRaw(
+                upload_id=upload_log.id,
+                pegawai_id=pegawai_id,
+                tahun=row.tahun,
+                bulan=row.bulan,
+                tm1=row.tm1, tm2=row.tm2, tm3=row.tm3, tmm=row.tmm,
+                pc1=row.pc1, pc2=row.pc2, pc3=row.pc3, pcm=row.pcm,
+                hn=row.hn, dl=row.dl, tk=row.tk, tb=row.tb,
+                itm=row.itm, ipc=row.ipc, idli=row.idli, idlo=row.idlo,
+                itmpc=row.itmpc, idl=row.idl,
+                ct=row.ct, cs=row.cs, cb=row.cb, cm=row.cm, ckap=row.ckap,
+                lj=row.lj, ln=row.ln,
             )
+            db.add(raw)
 
-    missing_nips = 0
-    for row in result.rows:
-        pegawai_id = existing_peg_nips.get(row.nip.strip()) if row.nip else None
-        if pegawai_id is None:
-            missing_nips += 1
-            continue
-        raw = PresensiRaw(
-            upload_id=upload_log.id,
-            pegawai_id=pegawai_id,
-            tahun=row.tahun,
-            bulan=row.bulan,
-            tm1=row.tm1, tm2=row.tm2, tm3=row.tm3, tmm=row.tmm,
-            pc1=row.pc1, pc2=row.pc2, pc3=row.pc3, pcm=row.pcm,
-            hn=row.hn, dl=row.dl, tk=row.tk, tb=row.tb,
-            itm=row.itm, ipc=row.ipc, idli=row.idli, idlo=row.idlo,
-            itmpc=row.itmpc, idl=row.idl,
-            ct=row.ct, cs=row.cs, cb=row.cb, cm=row.cm, ckap=row.ckap,
-            lj=row.lj, ln=row.ln,
+        upload_log.rows_imported = result.metadata.success_rows - missing_nips
+        await db.commit()
+
+        # Auto-run analytics for the uploaded period
+        if result.rows:
+            target_tahun = result.rows[0].tahun
+            target_bulan = result.rows[0].bulan
+            analytics = AnalyticsService(db)
+            await analytics.proses_agregat(upload_log.id, target_tahun, target_bulan)
+            await analytics.update_rankings(target_tahun, target_bulan)
+
+        error_details = [
+            UploadErrorDetail(row=e.row_number, column=e.column, value=str(e.value) if e.value else None, reason=e.reason)
+            for e in result.errors
+        ]
+
+        return UploadResponse(
+            status="success" if result.success else "partial_success",
+            upload_id=str(upload_log.id),
+            summary=UploadErrorSummary(
+                total_rows=result.metadata.total_rows,
+                success=result.metadata.success_rows,
+                errors=result.metadata.error_rows,
+                warnings=result.metadata.warning_count,
+            ),
+            errors=[e for e in error_details if e],
+            warnings=[],
         )
-        db.add(raw)
-
-    upload_log.rows_imported = result.metadata.success_rows - missing_nips
-    await db.commit()
-
-    # Auto-run analytics for the uploaded period
-    if result.rows:
-        target_tahun = result.rows[0].tahun
-        target_bulan = result.rows[0].bulan
-        analytics = AnalyticsService(db)
-        await analytics.proses_agregat(upload_log.id, target_tahun, target_bulan)
-        await analytics.update_rankings(target_tahun, target_bulan)
-
-    error_details = [
-        UploadErrorDetail(row=e.row_number, column=e.column, value=str(e.value) if e.value else None, reason=e.reason)
-        for e in result.errors
-    ]
-
-    return UploadResponse(
-        status="success" if result.success else "partial_success",
-        upload_id=str(upload_log.id),
-        summary=UploadErrorSummary(
-            total_rows=result.metadata.total_rows,
-            success=result.metadata.success_rows,
-            errors=result.metadata.error_rows,
-            warnings=result.metadata.warning_count,
-        ),
-        errors=[e for e in error_details if e],
-        warnings=[],
-    )
+    except (ValueError, FileNotFoundError) as e:
+        raise HTTPException(400, str(e))
+    finally:
+        if dest and os.path.exists(dest):
+            try:
+                os.remove(dest)
+            except Exception:
+                pass
 
 
 @router.get("/periods")

@@ -4,7 +4,7 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth, analytics, presensi, reports, users
+from app.api import auth, analytics, presensi, reports, users, public
 from app.core.config import settings
 
 
@@ -32,6 +32,7 @@ app.include_router(presensi.router, prefix="/api")
 app.include_router(analytics.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
+app.include_router(public.router, prefix="/api")
 
 
 @app.get("/health")
