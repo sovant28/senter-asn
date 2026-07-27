@@ -13,13 +13,16 @@ export async function GET(request: Request) {
   }
 
   // Retrieve connection string from env
-  const connectionString = process.env.DATABASE_URL;
+  let connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     return NextResponse.json(
       { error: "DATABASE_URL environment variable is not configured on Vercel" },
       { status: 500 }
     );
   }
+
+  // Clean the connection string to remove any python-specific asyncpg prefixes if present
+  connectionString = connectionString.replace("postgresql+asyncpg://", "postgresql://");
 
   // Create PG Client
   const client = new Client({
