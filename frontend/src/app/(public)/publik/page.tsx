@@ -11,6 +11,9 @@ import {
   Search,
   Sparkles,
   Info,
+  BadgeCheck,
+  ShieldCheck,
+  AlertCircle,
 } from "lucide-react";
 import ReactECharts from "echarts-for-react";
 import { StatsCard } from "@/components/stats-card";
@@ -119,9 +122,9 @@ export default function PublicDashboardPage() {
       {
         name: "Kategori",
         type: "pie",
-        radius: ["55%", "75%"],
-        center: ["50%", "45%"],
-        avoidLabelOverlap: false,
+        radius: ["45%", "65%"],
+        center: ["50%", "48%"],
+        avoidLabelOverlap: true,
         itemStyle: {
           borderRadius: 8,
           borderColor: "#fff",
@@ -320,7 +323,7 @@ export default function PublicDashboardPage() {
             <StatsCard
               label={`Rata-rata Skor Kabupaten (${activeBulanLabel})`}
               value={`${avgSkor.toFixed(2)}`}
-              icon={Activity}
+              icon={Award}
               iconBgColor="bg-teal-50"
               iconColor="text-teal-600"
               description={`Kategori: ${avgCat.label}`}
@@ -328,7 +331,7 @@ export default function PublicDashboardPage() {
             <StatsCard
               label="OPD Sangat Disiplin"
               value={dist.SANGAT_DISIPLIN}
-              icon={TrendingUp}
+              icon={BadgeCheck}
               iconBgColor="bg-green-50"
               iconColor="text-green-700"
               description="OPD dengan skor ≥ 90"
@@ -336,7 +339,7 @@ export default function PublicDashboardPage() {
             <StatsCard
               label="OPD Cukup Disiplin"
               value={dist.CUKUP}
-              icon={Building2}
+              icon={ShieldCheck}
               iconBgColor="bg-amber-50"
               iconColor="text-amber-600"
               description="OPD dengan skor 70 - 79.9"
