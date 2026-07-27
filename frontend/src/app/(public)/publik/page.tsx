@@ -566,7 +566,7 @@ export default function PublicDashboardPage() {
                     </tr>
                   ) : (
                     filteredRankings.map((row) => (
-                      <tr key={row.opd_id} className="hover:bg-slate-50/50 transition-colors duration-150">
+                      <tr key={row.opd_id} className="odd:bg-white even:bg-slate-50/40 hover:bg-slate-100/40 transition-colors duration-150">
                         <td className="py-3 px-4 text-center">
                           <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full font-bold ${
                             row.rank === 1
