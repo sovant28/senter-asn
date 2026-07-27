@@ -236,10 +236,15 @@ export default function PublicDashboardPage() {
     ],
   };
 
-  const BULAN_NAMES = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+  const BULAN_NAMES_SHORT = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
 
-  // Display only real calculated trend data from the database
-  const displayTrend = trendData;
+  // Populate monthly scores strictly for the selectedYear
+  const monthlyScores = Array(12).fill(null);
+  trendData.forEach((item) => {
+    if (item.tahun === selectedYear) {
+      monthlyScores[item.bulan - 1] = item.avg_skor;
+    }
+  });
 
   const lineOption = {
     tooltip: {
@@ -252,8 +257,7 @@ export default function PublicDashboardPage() {
     grid: { left: "3%", right: "3%", top: "15%", bottom: "8%", containLabel: true },
     xAxis: {
       type: "category",
-      boundaryGap: false,
-      data: displayTrend.map((t) => `${BULAN_NAMES[t.bulan]} ${t.tahun}`),
+      data: BULAN_NAMES_SHORT,
       axisLine: { lineStyle: { color: "#cbd5e1" } },
       axisLabel: { color: "#64748b", fontSize: 10, fontFamily: "Inter, sans-serif", fontWeight: 500 },
     },
@@ -266,14 +270,10 @@ export default function PublicDashboardPage() {
     },
     series: [
       {
-        name: "Rata-rata Skor Kabupaten",
-        type: "line",
-        smooth: true,
-        showSymbol: true,
-        symbolSize: 8,
-        itemStyle: { color: "#0a6c74" },
-        lineStyle: { width: 3 },
-        areaStyle: {
+        name: "Rata-rata Skor (Batang)",
+        type: "bar",
+        barWidth: "30%",
+        itemStyle: {
           color: {
             type: "linear",
             x: 0,
@@ -281,12 +281,24 @@ export default function PublicDashboardPage() {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: "rgba(10, 108, 116, 0.15)" },
-              { offset: 1, color: "rgba(10, 108, 116, 0.01)" },
+              { offset: 0, color: "rgba(10, 108, 116, 0.6)" },
+              { offset: 1, color: "rgba(10, 108, 116, 0.15)" },
             ],
           },
+          borderRadius: [6, 6, 0, 0],
         },
-        data: displayTrend.map((t) => t.avg_skor),
+        data: monthlyScores,
+      },
+      {
+        name: "Tren Kedisiplinan",
+        type: "line",
+        smooth: true,
+        connectNulls: true,
+        showSymbol: true,
+        symbolSize: 8,
+        itemStyle: { color: "#0a6c74" },
+        lineStyle: { width: 3 },
+        data: monthlyScores,
       },
     ],
   };
