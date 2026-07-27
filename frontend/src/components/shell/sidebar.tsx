@@ -29,7 +29,6 @@ export function Sidebar({ className = "", onClose }: SidebarProps) {
     { name: "Peringkat OPD", href: "/ranking", icon: Award },
     { name: "Upload Excel", href: "/upload", icon: Upload },
     { name: "Laporan PDF", href: "/reports", icon: FileText },
-    { name: "Metode Perhitungan", href: "/perhitungan", icon: Calculator },
   ];
 
   if (!user) return null;

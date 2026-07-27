@@ -236,12 +236,7 @@ export default function TentangSistemPage() {
         </div>
       </div>
 
-      {/* ===== CREDIT FOOTER ===== */}
-      <div className="pt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400">
-        <span>Dibuat dengan</span>
-        <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
-        <span>oleh Tim Pengembang SENTER ASN</span>
-      </div>
+
     </div>
   );
 }

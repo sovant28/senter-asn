@@ -1,11 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { name: "Dashboard", href: "/publik" },
+    { name: "Simulator Perhitungan", href: "/perhitungan" },
+    { name: "Tentang Sistem", href: "/tentang" },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -20,39 +28,55 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </div>
           </Link>
 
-          <nav className="flex items-center gap-6 text-xs font-bold">
-            <Link
-              href="/publik"
-              className={`transition-colors duration-200 ${
-                pathname === "/publik" || pathname === "/"
-                  ? "text-teal-700"
-                  : "text-slate-500 hover:text-teal-600"
-              }`}
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/perhitungan"
-              className={`transition-colors duration-200 ${
-                pathname === "/perhitungan"
-                  ? "text-teal-700"
-                  : "text-slate-500 hover:text-teal-600"
-              }`}
-            >
-              Simulator Perhitungan
-            </Link>
-            <Link
-              href="/tentang"
-              className={`transition-colors duration-200 ${
-                pathname === "/tentang"
-                  ? "text-teal-700"
-                  : "text-slate-500 hover:text-teal-600"
-              }`}
-            >
-              Tentang Sistem
-            </Link>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6 text-xs font-bold">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`transition-colors duration-200 ${
+                  pathname === item.href || (item.href === "/publik" && pathname === "/")
+                    ? "text-teal-700"
+                    : "text-slate-500 hover:text-teal-600"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
           </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-slate-650 hover:bg-slate-100 rounded-xl transition-colors outline-none"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
+
+        {/* Mobile Dropdown Navigation */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200 bg-white px-4 py-3 flex flex-col gap-2.5 shadow-sm">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || (item.href === "/publik" && pathname === "/");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    isActive
+                      ? "bg-teal-50 text-teal-700"
+                      : "text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </header>
 
       {/* MAIN CONTENT */}
