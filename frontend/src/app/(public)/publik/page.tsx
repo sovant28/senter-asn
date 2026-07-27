@@ -551,23 +551,23 @@ export default function PublicDashboardPage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-50 text-slate-500 border-b border-slate-100 font-bold uppercase tracking-wider">
-                    <th className="py-3 px-4 font-semibold w-16 text-center">Rank</th>
-                    <th className="py-3 px-4 font-semibold">Nama Dinas / Instansi</th>
-                    <th className="py-3 px-4 font-semibold text-center w-28">Skor Akhir</th>
-                    <th className="py-3 px-4 font-semibold text-center w-36">Kategori</th>
+                    <th className="py-3 px-2 sm:px-4 font-semibold w-12 sm:w-16 text-center">Rank</th>
+                    <th className="py-3 px-2 sm:px-4 font-semibold">Nama Dinas / Instansi</th>
+                    <th className="py-3 px-2 sm:px-4 font-semibold text-center w-20 sm:w-28">Skor Akhir</th>
+                    <th className="py-3 px-2 sm:px-4 font-semibold text-center w-28 sm:w-36">Kategori</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 font-medium">
                   {filteredRankings.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="py-6 px-4 text-center text-slate-400">
+                      <td colSpan={4} className="py-6 px-2 sm:px-4 text-center text-slate-400">
                         Tidak ada instansi yang cocok dengan kata pencarian.
                       </td>
                     </tr>
                   ) : (
                     filteredRankings.map((row) => (
                       <tr key={row.opd_id} className="odd:bg-white even:bg-slate-50/40 hover:bg-slate-100/40 transition-colors duration-150">
-                        <td className="py-3 px-4 text-center">
+                        <td className="py-3 px-2 sm:px-4 text-center">
                           <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full font-bold ${
                             row.rank === 1
                               ? "bg-yellow-100 text-yellow-800"
@@ -580,9 +580,9 @@ export default function PublicDashboardPage() {
                             {row.rank}
                           </span>
                         </td>
-                        <td className="py-3 px-4 font-semibold text-slate-700">{row.nama_opd}</td>
-                        <td className="py-3 px-4 text-center font-bold text-slate-700">{row.total_skor.toFixed(2)}</td>
-                        <td className="py-3 px-4 text-center">
+                        <td className="py-3 px-2 sm:px-4 font-semibold text-slate-700 text-[11px] sm:text-xs leading-tight">{row.nama_opd}</td>
+                        <td className="py-3 px-2 sm:px-4 text-center font-bold text-slate-700">{row.total_skor.toFixed(2)}</td>
+                        <td className="py-3 px-2 sm:px-4 text-center">
                           <div className="inline-flex items-center gap-1.5 justify-center">
                             <span className={`w-1.5 h-1.5 rounded-full ${dotColor(row.kategori)}`} />
                             <span className={`text-[11px] ${textColor(row.kategori)}`}>
