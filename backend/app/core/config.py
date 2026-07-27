@@ -27,5 +27,13 @@ class Settings(BaseSettings):
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 
+    def __init__(self, **values):
+        import os
+        if "DB_URL" in os.environ:
+            values["DATABASE_URL"] = os.environ["DB_URL"]
+        if "DB_URL_SYNC" in os.environ:
+            values["DATABASE_URL_SYNC"] = os.environ["DB_URL_SYNC"]
+        super().__init__(**values)
+
 
 settings = Settings()
