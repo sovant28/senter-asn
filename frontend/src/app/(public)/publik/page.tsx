@@ -328,13 +328,21 @@ export default function PublicDashboardPage() {
 
   const avgCat = getAvgCategory(avgSkor);
 
-  const katColor = (kat: string) =>
+  const dotColor = (kat: string) =>
     ({
-      SANGAT_DISIPLIN: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      DISIPLIN: "bg-green-50 text-green-700 border-green-200",
-      CUKUP: "bg-amber-50 text-amber-600 border-amber-200",
-      PERLU_PEMBINAAN: "bg-red-50 text-red-600 border-red-200",
-    }[kat] || "bg-slate-50 text-slate-600 border-slate-200");
+      SANGAT_DISIPLIN: "bg-emerald-500",
+      DISIPLIN: "bg-green-500",
+      CUKUP: "bg-amber-500",
+      PERLU_PEMBINAAN: "bg-red-500",
+    }[kat] || "bg-slate-400");
+
+  const textColor = (kat: string) =>
+    ({
+      SANGAT_DISIPLIN: "text-emerald-700 font-bold",
+      DISIPLIN: "text-green-700 font-bold",
+      CUKUP: "text-amber-700 font-bold",
+      PERLU_PEMBINAAN: "text-red-700 font-bold",
+    }[kat] || "text-slate-600 font-medium");
 
   const katLabel = (kat: string) =>
     ({
@@ -575,9 +583,12 @@ export default function PublicDashboardPage() {
                         <td className="py-3 px-4 font-semibold text-slate-700">{row.nama_opd}</td>
                         <td className="py-3 px-4 text-center font-bold text-slate-700">{row.total_skor.toFixed(2)}</td>
                         <td className="py-3 px-4 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${katColor(row.kategori)}`}>
-                            {katLabel(row.kategori)}
-                          </span>
+                          <div className="inline-flex items-center gap-1.5 justify-center">
+                            <span className={`w-1.5 h-1.5 rounded-full ${dotColor(row.kategori)}`} />
+                            <span className={`text-[11px] ${textColor(row.kategori)}`}>
+                              {katLabel(row.kategori)}
+                            </span>
+                          </div>
                         </td>
                       </tr>
                     ))
