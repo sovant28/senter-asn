@@ -156,6 +156,28 @@ String: max length 200, anti XSS, anti SQL injection
 
 ---
 
+## 🎰 Pertahanan Khusus Terhadap Defacement & Injeksi Judi Online (Anti-SEO Spam)
+
+Situs web instansi pemerintah (`.go.id`) adalah target utama sindikat judi online (*black hat SEO spam*) untuk menyisipkan ribuan tautan/laman judi guna memanfaatkan tingginya reputasi domain (*Domain Authority*). Berikut adalah protokol keamanan khusus yang diimplementasikan di SENTER ASN untuk mencegah penyusupan dan perusakan tampilan (*defacement*):
+
+### 1. Pencegahan Injeksi File Statis (Anti-Upload HTML & Shell)
+* **Karantina Data Ungguhan**: Berkas Excel presensi yang diunggah oleh admin **tidak disimpan secara fisik** di direktori server publik (tidak ada folder `/uploads` yang dapat diakses publik via HTTP). Data diproses secara *in-memory* menggunakan openpyxl/pandas di backend, diekstrak menjadi data relasional database, dan berkas temporer langsung dihapus seketika. Hal ini meniadakan celah bagi peretas untuk mengunggah skrip backdoor (seperti shell PHP/JS) atau laman HTML judi ke direktori publik.
+* **Validasi Magic Byte Keras**: Endpoint unggahan memvalidasi berkas berdasarkan struktur byte-nya (magic byte `PK\x03\x04` untuk `.xlsx`), bukan sekadar memeriksa ekstensi nama berkas. File skrip jahat yang diganti ekstensinya secara manipulatif menjadi `.xlsx` akan ditolak secara otomatis oleh backend.
+
+### 2. Pencegahan Injeksi Konten Dinamis (Anti-XSS & Anti-HTML Injection)
+* **Auto-Escaping React/Next.js**: Semua input data teks (seperti nama OPD, nama pegawai, keyword pencarian) yang dirender di frontend dibungkus oleh binding JSX Next.js yang secara otomatis melakukan *escaping* karakter khusus (seperti `<` menjadi `&lt;`). Ini memblokir eksekusi skrip injeksi (*Cross-Site Scripting*).
+* **Sanitasi Sisi Backend**: FastAPI menggunakan Pydantic untuk memvalidasi tipe data input, dan SQLAlchemy ORM melakukan parameterisasi penuh pada seluruh kueri database. Peretas tidak dapat melakukan SQL Injection untuk mengambil alih akun administrator atau menyisipkan baris tautan promosi judi ke dalam database.
+
+### 3. Kebijakan Keamanan Konten (Content Security Policy - CSP) Ketat
+* **Restriksi Eksekusi Skrip**: Mengonfigurasi header HTTP `Content-Security-Policy` (CSP) untuk membatasi peramban agar hanya mengeksekusi berkas Javascript yang berasal dari domain kita sendiri (`self`).
+* **Blokir External Script Injections**: Meskipun peretas berhasil menyisipkan tag `<script src="https://judi-online-link/slot.js">` melalui kelengahan tertentu, peramban pengguna akan memblokir dan menolak memuat skrip eksternal tersebut secara otomatis karena melanggar aturan CSP.
+
+### 4. Proteksi Subdomain & DNS Monitoring
+* **Cloudflare Proxy & WAF**: Mengaktifkan Cloudflare WAF (Web Application Firewall) pada domain produksi untuk memblokir bot scanning otomatis yang mencari celah keamanan (*vulnerability scanning*).
+* **Monitoring Subdomain Takeover**: Membatasi hak akses pengelolaan DNS BKPSDM Tana Toraja untuk mencegah eksploitasi rekaman DNS mati (dead CNAME) yang sering disalahgunakan sindikat judi online untuk membuat subdomain baru di bawah domain utama `.go.id`.
+
+---
+
 ## 📜 UU PDP Compliance
 
 ### Pemetaan UU PDP ke Kontrol Teknis
