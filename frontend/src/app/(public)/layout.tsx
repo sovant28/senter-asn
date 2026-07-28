@@ -34,11 +34,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <Link
                 key={item.href}
                 href={item.href}
-                className={`transition-colors duration-200 ${
-                  pathname === item.href || (item.href === "/publik" && pathname === "/")
+                className={`transition-colors duration-200 ${pathname === item.href || (item.href === "/publik" && pathname === "/")
                     ? "text-teal-700"
                     : "text-slate-500 hover:text-teal-600"
-                }`}
+                  }`}
               >
                 {item.name}
               </Link>
@@ -65,11 +64,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                    isActive
+                  className={`px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${isActive
                       ? "bg-teal-50 text-teal-700"
                       : "text-slate-600 hover:bg-slate-50"
-                  }`}
+                    }`}
                 >
                   {item.name}
                 </Link>
@@ -88,7 +86,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <footer className="bg-white border-t border-slate-200 py-6 mt-8">
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-medium">
           <div className="text-center sm:text-left leading-relaxed">
-            Salam Kinerja & Disiplin ASN • Tabe'! Dibuat dengan ❤️ oleh Tim Pengembang SENTER ASN
+            Salam Kinerja & Disiplin ASN • Dibuat dengan ❤️ oleh Tim Pengembang SENTER ASN
           </div>
           <div className="text-slate-400 font-semibold shrink-0">
             SENTER ASN v0.1.0
