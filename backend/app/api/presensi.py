@@ -229,6 +229,16 @@ async def upload_presensi(
             for e in result.errors
         ]
 
+        warnings_list = []
+        if has_mismatch:
+            warnings_list.append(
+                f"Berkas Excel terdeteksi berisi data periode {parsed_bulan}/{parsed_tahun}, tetapi sistem telah menyesuaikannya otomatis menjadi {bulan}/{tahun} sesuai pilihan periode di form upload Anda."
+            )
+        for w in result.warnings:
+            col_str = f" pada kolom {w.column}" if w.column else ""
+            val_str = f" (Nilai: '{w.value}')" if w.value is not None else ""
+            warnings_list.append(f"Baris {w.row_number}: {w.reason}{col_str}{val_str}")
+
         return UploadResponse(
             status="success" if result.success else "partial_success",
             upload_id=str(upload_log.id),
@@ -239,9 +249,7 @@ async def upload_presensi(
                 warnings=result.metadata.warning_count,
             ),
             errors=[e for e in error_details if e],
-            warnings=[
-                f"Berkas Excel terdeteksi berisi data periode {parsed_bulan}/{parsed_tahun}, tetapi sistem telah menyesuaikannya otomatis menjadi {bulan}/{tahun} sesuai pilihan periode di form upload Anda."
-            ] if has_mismatch else [],
+            warnings=warnings_list,
         )
     except (ValueError, FileNotFoundError) as e:
         raise HTTPException(400, str(e))
