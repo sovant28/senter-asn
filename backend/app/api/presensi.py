@@ -19,6 +19,8 @@ router = APIRouter(prefix="/presensi", tags=["presensi"])
 @router.post("/upload", status_code=status.HTTP_202_ACCEPTED)
 async def upload_presensi(
     file: UploadFile = File(...),
+    tahun: int | None = Query(None),
+    bulan: int | None = Query(None),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_role("SUPER_ADMIN", "HR_MANAGER")),
 ):
@@ -36,7 +38,12 @@ async def upload_presensi(
         dest = await save_upload_file(file)
 
         parser = ExcelPresensiParser()
-        result = parser.parse(dest)
+        parse_kwargs = {}
+        if tahun is not None:
+            parse_kwargs["default_tahun"] = tahun
+        if bulan is not None:
+            parse_kwargs["default_bulan"] = bulan
+        result = parser.parse(dest, **parse_kwargs)
 
         upload_log = UploadLog(
             uploaded_by=current_user.id,

@@ -38,6 +38,18 @@ export default function UploadPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const router = useRouter();
 
+  // Default to previous month
+  const [tahun, setTahun] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d.getFullYear();
+  });
+  const [bulan, setBulan] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d.getMonth() + 1;
+  });
+
   useEffect(() => {
     if (!authLoading && !user) router.push("/login");
   }, [user, authLoading, router]);
@@ -53,7 +65,7 @@ export default function UploadPage() {
     setError("");
     setResult(null);
     try {
-      const data = await uploadExcel(file);
+      const data = await uploadExcel(file, tahun, bulan);
       setResult(data);
       setRefreshKey((k) => k + 1);
       if ((data.summary?.errors || 0) > 0 || (data.summary?.success || 0) === 0) {
@@ -75,7 +87,7 @@ export default function UploadPage() {
   async function handleAnalytics() {
     setRunningAnalytics(true);
     try {
-      await runAnalytics(2026, 6);
+      await runAnalytics(tahun, bulan);
       setAnalyticsDone(true);
       setRefreshKey((k) => k + 1);
     } catch {
@@ -84,6 +96,11 @@ export default function UploadPage() {
       setRunningAnalytics(false);
     }
   }
+
+  const MONTH_NAMES = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
 
   return (
     <div className="space-y-8 w-full">
@@ -125,7 +142,43 @@ export default function UploadPage() {
               </div>
               <div>
                 <h4 className="text-sm font-bold text-slate-800">Unggah Laporan Baru</h4>
-                <p className="text-xs text-slate-400 font-semibold mt-0.5">Pilih dokumen Excel presensi (.xlsx)</p>
+                <p className="text-xs text-slate-400 font-semibold mt-0.5">Pilih periode dan dokumen Excel presensi (.xlsx)</p>
+              </div>
+            </div>
+
+            {/* Periode Upload Selector */}
+            <div className="w-full bg-slate-50 p-4 rounded-2xl border border-slate-100/70 flex flex-col sm:flex-row gap-4 justify-center items-center text-left">
+              <div className="w-full sm:w-auto">
+                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Bulan Laporan</label>
+                <select
+                  value={bulan}
+                  onChange={(e) => {
+                    setBulan(Number(e.target.value));
+                    setAnalyticsDone(false);
+                    setResult(null);
+                  }}
+                  className="w-full sm:w-44 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500"
+                >
+                  {MONTH_NAMES.map((m, idx) => (
+                    <option key={idx + 1} value={idx + 1}>{m}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-full sm:w-auto">
+                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Tahun Laporan</label>
+                <select
+                  value={tahun}
+                  onChange={(e) => {
+                    setTahun(Number(e.target.value));
+                    setAnalyticsDone(false);
+                    setResult(null);
+                  }}
+                  className="w-full sm:w-32 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500"
+                >
+                  {[2024, 2025, 2026, 2027].map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -237,14 +290,32 @@ export default function UploadPage() {
       </div>
 
       {/* ===== PANEL KONTROL KELENGKAPAN UPLOAD OPD ===== */}
-      <OpdUploadControlPanel refreshKey={refreshKey} />
+      <OpdUploadControlPanel
+        refreshKey={refreshKey}
+        tahun={tahun}
+        setTahun={setTahun}
+        bulan={bulan}
+        setBulan={setBulan}
+      />
     </div>
   );
 }
 
-function OpdUploadControlPanel({ refreshKey }: { refreshKey: number }) {
-  const [tahun, setTahun] = useState(2026);
-  const [bulan, setBulan] = useState(6);
+interface OpdUploadControlPanelProps {
+  refreshKey: number;
+  tahun: number;
+  setTahun: (t: number) => void;
+  bulan: number;
+  setBulan: (b: number) => void;
+}
+
+function OpdUploadControlPanel({
+  refreshKey,
+  tahun,
+  setTahun,
+  bulan,
+  setBulan,
+}: OpdUploadControlPanelProps) {
   const [loading, setLoading] = useState(true);
   const [statusData, setStatusData] = useState<any>(null);
   const [filterTab, setFilterTab] = useState<"ALL" | "SUDAH" | "BELUM">("ALL");
@@ -308,8 +379,9 @@ function OpdUploadControlPanel({ refreshKey }: { refreshKey: number }) {
             onChange={(e) => setTahun(Number(e.target.value))}
             className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700"
           >
-            <option value={2026}>2026</option>
-            <option value={2025}>2025</option>
+            {[2024, 2025, 2026, 2027].map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
           </select>
         </div>
       </div>

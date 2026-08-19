@@ -112,10 +112,15 @@ export async function fetchOpdDetail(opdId: number, tahun: number, bulan: number
   return res.json();
 }
 
-export async function uploadExcel(file: File) {
+export async function uploadExcel(file: File, tahun?: number, bulan?: number) {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await authFetch("/presensi/upload", {
+  const queryParams = [];
+  if (tahun) queryParams.push(`tahun=${tahun}`);
+  if (bulan) queryParams.push(`bulan=${bulan}`);
+  const queryString = queryParams.length > 0 ? `?${queryParams.join("&")}` : "";
+
+  const res = await authFetch(`/presensi/upload${queryString}`, {
     method: "POST",
     body: formData,
   });
