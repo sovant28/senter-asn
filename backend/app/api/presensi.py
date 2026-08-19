@@ -72,10 +72,32 @@ async def upload_presensi(
         db.add(upload_log)
         await db.flush()
 
+        # --- Normalize unit kerja names using aliases ---
+        OPD_ALIASES = {
+            "BKPSDM": "Badan Kepegawaian dan Pengembangan Sumber Daya Manusia",
+            "BPKPD": "Badan Pengelolaan Keuangan dan Pendapatan Daerah",
+            "BAPELITBANGDA": "Badan Perencanaan Pembangunan, Penelitian dan Pengembangan Daerah",
+            "BAPPEDA": "Badan Perencanaan Pembangunan, Penelitian dan Pengembangan Daerah",
+            "DISKOPDAGRIN": "Dinas Koperasi, Usaha Kecil dan Menengah, Perdagangan dan Perindustrian",
+            "DP3AP2KB": "Dinas Pemberdayaan Perempuan dan Perlindungan Anak, Pengendalian Penduduk dan Keluarga Berencana",
+            "DPMPTSP": "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu",
+            "SATPOL PP": "Satuan Polisi Pamong Praja, Pemadam Kebakaran dan Penyelamatan",
+            "SATPOLPP": "Satuan Polisi Pamong Praja, Pemadam Kebakaran dan Penyelamatan",
+        }
+        for r in result.rows:
+            if r.unit_kerja:
+                normalized = r.unit_kerja.strip()
+                if normalized in OPD_ALIASES:
+                    r.unit_kerja = OPD_ALIASES[normalized]
+
         # --- Auto-import OPD from UNIT KERJA column (bulk) ---
         unit_names = sorted({r.unit_kerja.strip() for r in result.rows if r.unit_kerja})
         existing_opd_rows = (await db.execute(
-            select(OPD.nama_opd, OPD.id, OPD.kode_opd).where(OPD.nama_opd.in_(unit_names))
+            select(OPD.nama_opd, OPD.id, OPD.kode_opd)
+            .where(
+                OPD.nama_opd.in_(unit_names),
+                OPD.is_active == True
+            )
         )).all()
         opd_by_name: dict[str, tuple[int, str]] = {}
         existing_kodes: set[str] = set()
