@@ -45,6 +45,16 @@ async def upload_presensi(
             parse_kwargs["default_bulan"] = bulan
         result = parser.parse(dest, **parse_kwargs)
 
+        # Validate that the parsed period matches the selected period
+        if result.rows:
+            parsed_tahun = result.rows[0].tahun
+            parsed_bulan = result.rows[0].bulan
+            if (tahun is not None and parsed_tahun != tahun) or (bulan is not None and parsed_bulan != bulan):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Periode berkas tidak cocok. Berkas Excel terdeteksi berisi data untuk periode {parsed_bulan}/{parsed_tahun}, tetapi Anda memilih {bulan}/{tahun} di form upload. Silakan ganti pilihan periode atau periksa isi sel kolom BULAN/TAHUN di Excel Anda."
+                )
+
         upload_log = UploadLog(
             uploaded_by=current_user.id,
             file_hash_sha256=result.metadata.file_hash,
