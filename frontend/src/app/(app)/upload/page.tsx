@@ -83,10 +83,39 @@ export default function UploadPage() {
   }
 
   async function handleAnalytics() {
-    if (!uploadedPeriod) return;
+    let targetTahun = uploadedPeriod?.tahun;
+    let targetBulan = uploadedPeriod?.bulan;
+
+    if (!targetTahun || !targetBulan) {
+      const fileNameLower = file?.name.toLowerCase() || "";
+      const currentYear = new Date().getFullYear();
+      
+      const yearMatch = fileNameLower.match(/\b(202\d)\b/);
+      targetTahun = yearMatch ? parseInt(yearMatch[1], 10) : currentYear;
+
+      if (fileNameLower.includes("jan")) targetBulan = 1;
+      else if (fileNameLower.includes("feb")) targetBulan = 2;
+      else if (fileNameLower.includes("mar")) targetBulan = 3;
+      else if (fileNameLower.includes("apr")) targetBulan = 4;
+      else if (fileNameLower.includes("mei") || fileNameLower.includes("may")) targetBulan = 5;
+      else if (fileNameLower.includes("jun")) targetBulan = 6;
+      else if (fileNameLower.includes("jul")) targetBulan = 7;
+      else if (fileNameLower.includes("agu") || fileNameLower.includes("aug")) targetBulan = 8;
+      else if (fileNameLower.includes("sep")) targetBulan = 9;
+      else if (fileNameLower.includes("okt") || fileNameLower.includes("oct")) targetBulan = 10;
+      else if (fileNameLower.includes("nov")) targetBulan = 11;
+      else if (fileNameLower.includes("des") || fileNameLower.includes("dec")) targetBulan = 12;
+      else {
+        const d = new Date();
+        d.setMonth(d.getMonth() - 1);
+        targetBulan = d.getMonth() + 1;
+        targetTahun = d.getFullYear();
+      }
+    }
+
     setRunningAnalytics(true);
     try {
-      await runAnalytics(uploadedPeriod.tahun, uploadedPeriod.bulan);
+      await runAnalytics(targetTahun, targetBulan);
       setAnalyticsDone(true);
       setRefreshKey((k) => k + 1);
     } catch {
