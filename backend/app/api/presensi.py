@@ -296,3 +296,40 @@ async def get_opd_upload_status(
         },
         "opd_list": opd_status_list,
     }
+
+
+@router.get("/history")
+async def get_upload_history(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(
+            UploadLog.id,
+            UploadLog.file_name_original,
+            UploadLog.tahun,
+            UploadLog.bulan,
+            UploadLog.rows_imported,
+            UploadLog.status,
+            UploadLog.created_at,
+            User.username,
+        )
+        .join(User, UploadLog.uploaded_by == User.id)
+        .order_by(UploadLog.created_at.desc())
+        .limit(20)
+    )
+    
+    history = []
+    for row in result.all():
+        history.append({
+            "id": str(row[0]),
+            "filename": row[1],
+            "tahun": row[2],
+            "bulan": row[3],
+            "rows_imported": row[4],
+            "status": row[5],
+            "created_at": row[6].isoformat() if row[6] else None,
+            "uploaded_by": row[7],
+        })
+        
+    return {"history": history}

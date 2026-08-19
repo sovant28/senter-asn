@@ -152,3 +152,8 @@ export async function fetchPeriods() {
   const res = await authFetch("/presensi/periods");
   return res.json();
 }
+
+export async function fetchUploadHistory() {
+  const res = await authFetch("/presensi/history");
+  return res.json();
+}

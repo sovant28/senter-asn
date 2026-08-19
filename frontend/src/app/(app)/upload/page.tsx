@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { uploadExcel, runAnalytics, fetchOpdUploadStatus } from "@/lib/api";
+import { uploadExcel, runAnalytics, fetchOpdUploadStatus, fetchUploadHistory } from "@/lib/api";
 import {
   FileUp,
   CheckCircle,
   AlertTriangle,
   Loader2,
   ArrowRight,
+  FileClock,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -297,6 +298,9 @@ export default function UploadPage() {
         bulan={bulan}
         setBulan={setBulan}
       />
+
+      {/* ===== PANEL RIWAYAT UPLOAD ===== */}
+      <UploadHistoryPanel refreshKey={refreshKey} />
     </div>
   );
 }
@@ -503,6 +507,123 @@ function OpdUploadControlPanel({
                   </tr>
                 ))
               )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface HistoryItem {
+  id: string;
+  filename: string;
+  tahun: number;
+  bulan: number;
+  rows_imported: number;
+  status: string;
+  created_at: string;
+  uploaded_by: string;
+}
+
+function UploadHistoryPanel({ refreshKey }: { refreshKey: number }) {
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadHistory = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchUploadHistory();
+      setHistory(data.history || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory, refreshKey]);
+
+  const bulanNames = [
+    "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+
+  return (
+    <div className="bg-white rounded-3xl border border-slate-200 p-8 space-y-6">
+      <div>
+        <h3 className="font-display text-lg font-bold text-slate-800 flex items-center gap-2">
+          <FileClock className="w-5 h-5 text-teal-600" />
+          Riwayat Aktivitas Unggahan (Log Upload)
+        </h3>
+        <p className="text-xs text-slate-500 font-medium mt-0.5">
+          Pantau aktivitas unggahan berkas oleh administrator untuk mengaudit duplikasi, penimpaan file, dan waktu unggah.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-6 text-slate-400 text-xs font-semibold">
+          Memuat riwayat unggahan...
+        </div>
+      ) : history.length === 0 ? (
+        <div className="text-center py-6 text-slate-400 text-xs font-semibold border border-dashed border-slate-200 rounded-2xl bg-slate-50/20">
+          Belum ada riwayat aktivitas unggahan.
+        </div>
+      ) : (
+        <div className="overflow-x-auto border border-slate-200/80 rounded-2xl">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200 font-bold text-slate-700">
+                <th className="py-3 px-4">Waktu Unggah</th>
+                <th className="py-3 px-4">Nama File</th>
+                <th className="py-3 px-4 text-center">Periode Data</th>
+                <th className="py-3 px-4 text-center">Baris Sukses</th>
+                <th className="py-3 px-4 text-center">Status</th>
+                <th className="py-3 px-4">Operator</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map((item) => {
+                const dateObj = item.created_at ? new Date(item.created_at) : null;
+                const formattedDate = dateObj 
+                  ? dateObj.toLocaleString("id-ID", { 
+                      day: "2-digit", 
+                      month: "short", 
+                      year: "numeric", 
+                      hour: "2-digit", 
+                      minute: "2-digit" 
+                    }) 
+                  : "-";
+                
+                return (
+                  <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50/30 transition-colors font-medium">
+                    <td className="py-3 px-4 text-slate-550">{formattedDate} WITA</td>
+                    <td className="py-3 px-4 text-slate-800 font-bold max-w-xs truncate" title={item.filename}>
+                      {item.filename}
+                    </td>
+                    <td className="py-3 px-4 text-center text-slate-750 font-bold">
+                      {bulanNames[item.bulan]} {item.tahun}
+                    </td>
+                    <td className="py-3 px-4 text-center text-slate-600 font-bold">
+                      {item.rows_imported} baris
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                        item.status === "SUCCESS"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : item.status === "PARTIAL"
+                          ? "bg-amber-50 text-amber-700 border-amber-200"
+                          : "bg-red-50 text-red-700 border-red-200"
+                      }`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-slate-700">@{item.uploaded_by}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
