@@ -26,6 +26,7 @@ interface UploadResult {
     row: number;
     reason: string;
   }>;
+  warnings?: string[];
 }
 
 export default function UploadPage() {
@@ -242,6 +243,17 @@ export default function UploadPage() {
                 <span className="text-amber-600 font-bold text-sm">{String(result.summary?.warnings || 0)}</span>
               </div>
             </div>
+
+            {Array.isArray(result.warnings) && result.warnings.length > 0 && (
+              <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl text-xs font-semibold text-amber-800 space-y-2">
+                {result.warnings.map((w, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600" />
+                    <span className="leading-relaxed">{w}</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {Array.isArray(result.errors) && result.errors.length > 0 && (
               <details className="mt-3">

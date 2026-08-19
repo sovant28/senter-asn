@@ -157,4 +157,4 @@ class UploadResponse(BaseModel):
     upload_id: Optional[str] = None
     summary: UploadErrorSummary
     errors: list[UploadErrorDetail] = []
-    warnings: list[UploadErrorDetail] = []
+    warnings: list[str] = []

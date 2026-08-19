@@ -45,15 +45,22 @@ async def upload_presensi(
             parse_kwargs["default_bulan"] = bulan
         result = parser.parse(dest, **parse_kwargs)
 
-        # Validate that the parsed period matches the selected period
+        # Auto-correct the month and year of the parsed rows to match the selected dropdown
+        has_mismatch = False
+        parsed_tahun = result.rows[0].tahun if result.rows else (tahun or 2026)
+        parsed_bulan = result.rows[0].bulan if result.rows else (bulan or 6)
+
         if result.rows:
             parsed_tahun = result.rows[0].tahun
             parsed_bulan = result.rows[0].bulan
             if (tahun is not None and parsed_tahun != tahun) or (bulan is not None and parsed_bulan != bulan):
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Periode berkas tidak cocok. Berkas Excel terdeteksi berisi data untuk periode {parsed_bulan}/{parsed_tahun}, tetapi Anda memilih {bulan}/{tahun} di form upload. Silakan ganti pilihan periode atau periksa isi sel kolom BULAN/TAHUN di Excel Anda."
-                )
+                has_mismatch = True
+                # Override the values in the parsed rows to match the user's explicit selection
+                for row in result.rows:
+                    if tahun is not None:
+                        row.tahun = tahun
+                    if bulan is not None:
+                        row.bulan = bulan
 
         upload_log = UploadLog(
             uploaded_by=current_user.id,
@@ -232,7 +239,9 @@ async def upload_presensi(
                 warnings=result.metadata.warning_count,
             ),
             errors=[e for e in error_details if e],
-            warnings=[],
+            warnings=[
+                f"Berkas Excel terdeteksi berisi data periode {parsed_bulan}/{parsed_tahun}, tetapi sistem telah menyesuaikannya otomatis menjadi {bulan}/{tahun} sesuai pilihan periode di form upload Anda."
+            ] if has_mismatch else [],
         )
     except (ValueError, FileNotFoundError) as e:
         raise HTTPException(400, str(e))
