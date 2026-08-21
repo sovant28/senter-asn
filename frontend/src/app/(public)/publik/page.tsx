@@ -306,7 +306,7 @@ export default function PublicDashboardPage() {
         data: monthlyScores,
       },
       {
-        name: "Tren Kedisiplinan",
+        name: "Rata-rata Skor (Garis)",
         type: "line",
         smooth: true,
         connectNulls: true,
