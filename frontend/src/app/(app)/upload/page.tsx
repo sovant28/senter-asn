@@ -121,120 +121,118 @@ export default function UploadPage() {
         </div>
       )}
 
-      {/* ===== TWO-COLUMN UPLOAD & GUIDE LAYOUT ===== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* LEFT COLUMN: UPLOAD ZONE (7 Cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-8 flex flex-col items-center justify-center text-center">
-          {uploading ? (
-            <div className="py-8 space-y-4">
-              <Loader2 className="w-12 h-12 text-teal-600 animate-spin mx-auto" />
-              <div>
-                <p className="text-slate-700 font-bold text-sm">Mengunggah dan memproses dokumen...</p>
-                <p className="text-xs text-slate-400 mt-1">
-                  {file?.name} ({file?.size && file.size > 1024 * 1024 ? `${(file.size / 1024 / 1024).toFixed(1)} MB` : `${((file?.size || 0) / 1024).toFixed(0)} KB`})
-                </p>
-              </div>
-              <p className="text-[11px] text-slate-400 max-w-sm mx-auto leading-relaxed">
-                Koneksi sedang mengirimkan data. Proses pemetaan database kepegawaian dapat memakan waktu 1–2 menit untuk dokumen berukuran besar.
+      {/* ===== MAIN UPLOAD CARD ===== */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-8 flex flex-col items-center justify-center text-center">
+        {uploading ? (
+          <div className="py-8 space-y-4">
+            <Loader2 className="w-12 h-12 text-teal-600 animate-spin mx-auto" />
+            <div>
+              <p className="text-slate-700 font-bold text-sm">Mengunggah dan memproses dokumen...</p>
+              <p className="text-xs text-slate-400 mt-1">
+                {file?.name} ({file?.size && file.size > 1024 * 1024 ? `${(file.size / 1024 / 1024).toFixed(1)} MB` : `${((file?.size || 0) / 1024).toFixed(0)} KB`})
               </p>
             </div>
-          ) : (
-            <div className="w-full space-y-6">
-              {targetOpd && (
-                <div className="bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold p-4 rounded-2xl flex items-center justify-between gap-3 text-left">
-                  <div className="flex items-center gap-2">
-                    <FileUp className="w-4 h-4 text-teal-600 flex-shrink-0 animate-pulse" />
-                    <span>
-                      Upload khusus untuk OPD: <strong>{targetOpd.nama_opd}</strong>
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setTargetOpd(null)}
-                    className="px-2 py-1 bg-teal-100 hover:bg-teal-200 rounded-lg text-[10px] font-bold text-teal-800 transition"
-                  >
-                    Batal
-                  </button>
+            <p className="text-[11px] text-slate-400 max-w-sm mx-auto leading-relaxed">
+              Koneksi sedang mengirimkan data. Proses pemetaan database kepegawaian dapat memakan waktu 1–2 menit untuk dokumen berukuran besar.
+            </p>
+          </div>
+        ) : (
+          <div className="w-full max-w-xl space-y-6">
+            {targetOpd && (
+              <div className="bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold p-4 rounded-2xl flex items-center justify-between gap-3 text-left">
+                <div className="flex items-center gap-2">
+                  <FileUp className="w-4 h-4 text-teal-600 flex-shrink-0 animate-pulse" />
+                  <span>
+                    Upload khusus untuk OPD: <strong>{targetOpd.nama_opd}</strong>
+                  </span>
+                </div>
+                <button
+                  onClick={() => setTargetOpd(null)}
+                  className="px-2 py-1 bg-teal-100 hover:bg-teal-200 rounded-lg text-[10px] font-bold text-teal-800 transition"
+                >
+                  Batal
+                </button>
+              </div>
+            )}
+
+            <div className="flex flex-col items-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center">
+                <FileUp className="w-8 h-8" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-800">Unggah Laporan Baru</h4>
+                <p className="text-xs text-slate-400 font-semibold mt-0.5">Pilih berkas Excel presensi (.xlsx) yang telah disesuaikan</p>
+              </div>
+            </div>
+
+            {/* Periode Upload Selector */}
+            <div className="w-full bg-slate-50 p-4 rounded-2xl border border-slate-100/70 flex flex-col sm:flex-row gap-4 justify-center items-center text-left">
+              <div className="w-full sm:w-auto">
+                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Bulan Laporan</label>
+                <select
+                  value={bulan}
+                  onChange={(e) => {
+                    setBulan(Number(e.target.value));
+                    setAnalyticsDone(false);
+                    setResult(null);
+                  }}
+                  className="w-full sm:w-44 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500"
+                >
+                  {[
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                  ].map((m, idx) => (
+                    <option key={idx + 1} value={idx + 1}>{m}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-full sm:w-auto">
+                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Tahun Laporan</label>
+                <select
+                  value={tahun}
+                  onChange={(e) => {
+                    setTahun(Number(e.target.value));
+                    setAnalyticsDone(false);
+                    setResult(null);
+                  }}
+                  className="w-full sm:w-32 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500"
+                >
+                  {[2024, 2025, 2026, 2027].map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/40 text-center">
+              <input
+                type="file"
+                accept=".xlsx"
+                onChange={(e) => {
+                  setFile(e.target.files?.[0] || null);
+                  setResult(null);
+                  setError("");
+                }}
+                className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100/50 file:cursor-pointer cursor-pointer"
+              />
+              {file && (
+                <div className="mt-3 text-xs font-semibold text-slate-700 bg-white p-2 rounded-lg border border-slate-100 truncate">
+                  Dokumen terpilih: {file.name}
                 </div>
               )}
-
-              <div className="flex flex-col items-center space-y-3">
-                <div className="w-16 h-16 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center">
-                  <FileUp className="w-8 h-8" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-800">Unggah Laporan Baru</h4>
-                  <p className="text-xs text-slate-400 font-semibold mt-0.5">Pilih berkas Excel presensi (.xlsx) yang telah disesuaikan</p>
-                </div>
-              </div>
-
-              {/* Periode Upload Selector */}
-              <div className="w-full bg-slate-50 p-4 rounded-2xl border border-slate-100/70 flex flex-col sm:flex-row gap-4 justify-center items-center text-left">
-                <div className="w-full sm:w-auto">
-                  <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Bulan Laporan</label>
-                  <select
-                    value={bulan}
-                    onChange={(e) => {
-                      setBulan(Number(e.target.value));
-                      setAnalyticsDone(false);
-                      setResult(null);
-                    }}
-                    className="w-full sm:w-44 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500"
-                  >
-                    {[
-                      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-                    ].map((m, idx) => (
-                      <option key={idx + 1} value={idx + 1}>{m}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-full sm:w-auto">
-                  <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Tahun Laporan</label>
-                  <select
-                    value={tahun}
-                    onChange={(e) => {
-                      setTahun(Number(e.target.value));
-                      setAnalyticsDone(false);
-                      setResult(null);
-                    }}
-                    className="w-full sm:w-32 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500"
-                  >
-                    {[2024, 2025, 2026, 2027].map((y) => (
-                      <option key={y} value={y}>{y}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/40 text-center">
-                <input
-                  type="file"
-                  accept=".xlsx"
-                  onChange={(e) => {
-                    setFile(e.target.files?.[0] || null);
-                    setResult(null);
-                    setError("");
-                  }}
-                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100/50 file:cursor-pointer cursor-pointer"
-                />
-                {file && (
-                  <div className="mt-3 text-xs font-semibold text-slate-700 bg-white p-2 rounded-lg border border-slate-100 truncate">
-                    Dokumen terpilih: {file.name}
-                  </div>
-                )}
-              </div>
-
-              <button
-                onClick={handleUpload}
-                disabled={!file}
-                className="w-full py-2.5 bg-primary-dark text-white rounded-xl hover:bg-primary transition disabled:opacity-50 text-xs font-bold"
-              >
-                Upload & Proses Berkas
-              </button>
             </div>
-          )}
 
-          {/* ===== RESULTS ACCORDION PANEL ===== */}
+            <button
+              onClick={handleUpload}
+              disabled={!file}
+              className="w-full py-2.5 bg-primary-dark text-white rounded-xl hover:bg-primary transition disabled:opacity-50 text-xs font-bold"
+            >
+              Upload & Proses Berkas
+            </button>
+          </div>
+        )}
+
+        {/* ===== RESULTS ACCORDION PANEL ===== */}
         {result && (
           <div className="w-full text-left mt-8 p-5 bg-slate-50/50 rounded-2xl border border-slate-200/60 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
@@ -322,69 +320,6 @@ export default function UploadPage() {
             </div>
           </div>
         )}
-        </div>
-
-        {/* RIGHT COLUMN: FORMATTING GUIDE & EDUCATION (5 Cols) */}
-        <div className="lg:col-span-5 bg-slate-50 rounded-3xl border border-slate-200 p-8 space-y-6">
-          <div>
-            <h3 className="font-display text-sm font-bold text-slate-800 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
-              Panduan Format Berkas Excel (Penting)
-            </h3>
-            <p className="text-[11px] text-slate-500 font-semibold mt-1 leading-relaxed">
-              Agar sistem dapat membaca data absensi secara tepat dan tidak menimpa periode bulan lain, berkas Excel wajib mengikuti format standar berikut:
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/60 space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-[10px] font-extrabold">1</span>
-                <span className="text-xs font-bold text-slate-700">Wajib Kolom BULAN & TAHUN</span>
-              </div>
-              <p className="text-[11px] text-slate-400 font-semibold leading-relaxed pl-7">
-                Pastikan file Excel Anda memiliki kolom header bernama <code className="bg-slate-100 px-1.5 py-0.5 rounded text-rose-600 font-bold font-mono">BULAN</code> dan <code className="bg-slate-100 px-1.5 py-0.5 rounded text-rose-600 font-bold font-mono">TAHUN</code> di setiap baris pegawai.
-              </p>
-            </div>
-
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/60 space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-[10px] font-extrabold">2</span>
-                <span className="text-xs font-bold text-slate-700">Gunakan Angka Periode yang Tepat</span>
-              </div>
-              <p className="text-[11px] text-slate-400 font-semibold leading-relaxed pl-7">
-                Isi sel kolom <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-800 font-mono">BULAN</code> dengan angka bulannya (misal: <strong className="text-slate-800">7</strong> untuk Juli, <strong className="text-slate-800">6</strong> untuk Juni) dan kolom <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-800 font-mono">TAHUN</code> dengan tahunnya (misal: <strong className="text-slate-800">2026</strong>).
-              </p>
-            </div>
-
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/60 space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-[10px] font-extrabold">3</span>
-                <span className="text-xs font-bold text-slate-700">Template Contoh Header</span>
-              </div>
-              <div className="overflow-x-auto pl-7 pt-1">
-                <table className="w-full text-[9px] border-collapse text-left border border-slate-200">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 font-bold text-slate-500">
-                      <th className="p-1.5 border-r border-slate-200">NIP</th>
-                      <th className="p-1.5 border-r border-slate-200">NAMA</th>
-                      <th className="p-1.5 border-r border-slate-200">BULAN</th>
-                      <th className="p-1.5">TAHUN</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-slate-100 text-slate-450 font-medium">
-                      <td className="p-1.5 border-r border-slate-100">19700...</td>
-                      <td className="p-1.5 border-r border-slate-100">Melan...</td>
-                      <td className="p-1.5 border-r border-slate-100 text-teal-700 font-bold">7</td>
-                      <td className="p-1.5 text-teal-700 font-bold">2026</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* ===== PANEL KONTROL KELENGKAPAN UPLOAD OPD ===== */}
