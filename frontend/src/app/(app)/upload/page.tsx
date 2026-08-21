@@ -40,6 +40,9 @@ export default function UploadPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const router = useRouter();
 
+  // Target OPD specific override state
+  const [targetOpd, setTargetOpd] = useState<{ id: number; nama_opd: string } | null>(null);
+
   // Track the period returned from the successful upload to trigger recalculation dynamically
   const [uploadedPeriod, setUploadedPeriod] = useState<{ tahun: number; bulan: number } | null>(null);
 
@@ -60,12 +63,13 @@ export default function UploadPage() {
     setUploadedPeriod(null);
     setAnalyticsDone(false);
     try {
-      const data = await uploadExcel(file);
+      const data = await uploadExcel(file, undefined, undefined, targetOpd?.id);
       setResult(data);
       if (data.tahun && data.bulan) {
         setUploadedPeriod({ tahun: data.tahun, bulan: data.bulan });
       }
       setRefreshKey((k) => k + 1);
+      setTargetOpd(null);
       if ((data.summary?.errors || 0) > 0 || (data.summary?.success || 0) === 0) {
         setError(`Proses upload selesai dengan ${data.summary?.errors || 0} kesalahan. Periksa detail di bawah.`);
       }
@@ -161,6 +165,23 @@ export default function UploadPage() {
             </div>
           ) : (
             <div className="w-full space-y-6">
+              {targetOpd && (
+                <div className="bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold p-4 rounded-2xl flex items-center justify-between gap-3 text-left">
+                  <div className="flex items-center gap-2">
+                    <FileUp className="w-4 h-4 text-teal-600 flex-shrink-0 animate-pulse" />
+                    <span>
+                      Upload khusus untuk OPD: <strong>{targetOpd.nama_opd}</strong>
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setTargetOpd(null)}
+                    className="px-2 py-1 bg-teal-100 hover:bg-teal-200 rounded-lg text-[10px] font-bold text-teal-800 transition"
+                  >
+                    Batal
+                  </button>
+                </div>
+              )}
+
               <div className="flex flex-col items-center space-y-3">
                 <div className="w-16 h-16 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center">
                   <FileUp className="w-8 h-8" />
@@ -353,7 +374,13 @@ export default function UploadPage() {
       </div>
 
       {/* ===== PANEL KONTROL KELENGKAPAN UPLOAD OPD ===== */}
-      <OpdUploadControlPanel refreshKey={refreshKey} />
+      <OpdUploadControlPanel
+        refreshKey={refreshKey}
+        onSelectTargetOpd={(opd) => {
+          setTargetOpd(opd);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
 
       {/* ===== PANEL RIWAYAT UPLOAD ===== */}
       <UploadHistoryPanel refreshKey={refreshKey} />
@@ -361,7 +388,13 @@ export default function UploadPage() {
   );
 }
 
-function OpdUploadControlPanel({ refreshKey }: { refreshKey: number }) {
+function OpdUploadControlPanel({
+  refreshKey,
+  onSelectTargetOpd,
+}: {
+  refreshKey: number;
+  onSelectTargetOpd: (opd: { id: number; nama_opd: string }) => void;
+}) {
   const [tahun, setTahun] = useState(2026);
   const [bulan, setBulan] = useState(6);
   const [loading, setLoading] = useState(true);
@@ -509,12 +542,13 @@ function OpdUploadControlPanel({ refreshKey }: { refreshKey: number }) {
                 <th className="px-4 py-3 text-center">Jumlah Pegawai</th>
                 <th className="px-4 py-3 text-center">Total Skor</th>
                 <th className="px-4 py-3 text-center">Kategori</th>
+                <th className="px-4 py-3 text-center w-36">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
               {filteredOpds.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-400 font-semibold">
+                  <td colSpan={7} className="px-4 py-8 text-center text-slate-400 font-semibold">
                     Tidak ada OPD dalam kategori filter ini.
                   </td>
                 </tr>
@@ -547,6 +581,15 @@ function OpdUploadControlPanel({ refreshKey }: { refreshKey: number }) {
                       ) : (
                         <span className="text-slate-300">-</span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => onSelectTargetOpd({ id: item.opd_id, nama_opd: item.nama_opd })}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-700 rounded-xl text-[10px] font-bold transition shadow-sm"
+                      >
+                        <FileUp className="w-3.5 h-3.5" />
+                        Upload Khusus
+                      </button>
                     </td>
                   </tr>
                 ))

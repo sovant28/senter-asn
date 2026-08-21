@@ -21,6 +21,7 @@ async def upload_presensi(
     file: UploadFile = File(...),
     tahun: int | None = Query(None),
     bulan: int | None = Query(None),
+    opd_id: int | None = Query(None),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_role("SUPER_ADMIN", "HR_MANAGER")),
 ):
@@ -44,6 +45,18 @@ async def upload_presensi(
         if bulan is not None:
             parse_kwargs["default_bulan"] = bulan
         result = parser.parse(dest, **parse_kwargs)
+
+        # Force map OPD if opd_id query parameter is provided
+        forced_opd = None
+        if opd_id is not None:
+            forced_opd = (await db.execute(
+                select(OPD).where(OPD.id == opd_id, OPD.is_active == True)
+            )).scalar_one_or_none()
+            if not forced_opd:
+                raise HTTPException(400, f"OPD dengan ID {opd_id} tidak ditemukan atau tidak aktif.")
+            if result.rows:
+                for r in result.rows:
+                    r.unit_kerja = forced_opd.nama_opd
 
         # Auto-correct the month and year of the parsed rows to match the selected dropdown
         has_mismatch = False
