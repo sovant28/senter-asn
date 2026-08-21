@@ -43,8 +43,17 @@ export default function UploadPage() {
   // Target OPD specific override state
   const [targetOpd, setTargetOpd] = useState<{ id: number; nama_opd: string } | null>(null);
 
-  // Track the period returned from the successful upload to trigger recalculation dynamically
-  const [uploadedPeriod, setUploadedPeriod] = useState<{ tahun: number; bulan: number } | null>(null);
+  // Default upload period to previous month
+  const [tahun, setTahun] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d.getFullYear();
+  });
+  const [bulan, setBulan] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d.getMonth() + 1;
+  });
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login");
@@ -60,14 +69,10 @@ export default function UploadPage() {
     setUploading(true);
     setError("");
     setResult(null);
-    setUploadedPeriod(null);
     setAnalyticsDone(false);
     try {
-      const data = await uploadExcel(file, undefined, undefined, targetOpd?.id);
+      const data = await uploadExcel(file, tahun, bulan, targetOpd?.id);
       setResult(data);
-      if (data.tahun && data.bulan) {
-        setUploadedPeriod({ tahun: data.tahun, bulan: data.bulan });
-      }
       setRefreshKey((k) => k + 1);
       setTargetOpd(null);
       if ((data.summary?.errors || 0) > 0 || (data.summary?.success || 0) === 0) {
@@ -87,39 +92,9 @@ export default function UploadPage() {
   }
 
   async function handleAnalytics() {
-    let targetTahun = uploadedPeriod?.tahun;
-    let targetBulan = uploadedPeriod?.bulan;
-
-    if (!targetTahun || !targetBulan) {
-      const fileNameLower = file?.name.toLowerCase() || "";
-      const currentYear = new Date().getFullYear();
-      
-      const yearMatch = fileNameLower.match(/\b(202\d)\b/);
-      targetTahun = yearMatch ? parseInt(yearMatch[1], 10) : currentYear;
-
-      if (fileNameLower.includes("jan")) targetBulan = 1;
-      else if (fileNameLower.includes("feb")) targetBulan = 2;
-      else if (fileNameLower.includes("mar")) targetBulan = 3;
-      else if (fileNameLower.includes("apr")) targetBulan = 4;
-      else if (fileNameLower.includes("mei") || fileNameLower.includes("may")) targetBulan = 5;
-      else if (fileNameLower.includes("jun")) targetBulan = 6;
-      else if (fileNameLower.includes("jul")) targetBulan = 7;
-      else if (fileNameLower.includes("agu") || fileNameLower.includes("aug")) targetBulan = 8;
-      else if (fileNameLower.includes("sep")) targetBulan = 9;
-      else if (fileNameLower.includes("okt") || fileNameLower.includes("oct")) targetBulan = 10;
-      else if (fileNameLower.includes("nov")) targetBulan = 11;
-      else if (fileNameLower.includes("des") || fileNameLower.includes("dec")) targetBulan = 12;
-      else {
-        const d = new Date();
-        d.setMonth(d.getMonth() - 1);
-        targetBulan = d.getMonth() + 1;
-        targetTahun = d.getFullYear();
-      }
-    }
-
     setRunningAnalytics(true);
     try {
-      await runAnalytics(targetTahun, targetBulan);
+      await runAnalytics(tahun, bulan);
       setAnalyticsDone(true);
       setRefreshKey((k) => k + 1);
     } catch {
@@ -189,6 +164,45 @@ export default function UploadPage() {
                 <div>
                   <h4 className="text-sm font-bold text-slate-800">Unggah Laporan Baru</h4>
                   <p className="text-xs text-slate-400 font-semibold mt-0.5">Pilih berkas Excel presensi (.xlsx) yang telah disesuaikan</p>
+                </div>
+              </div>
+
+              {/* Periode Upload Selector */}
+              <div className="w-full bg-slate-50 p-4 rounded-2xl border border-slate-100/70 flex flex-col sm:flex-row gap-4 justify-center items-center text-left">
+                <div className="w-full sm:w-auto">
+                  <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Bulan Laporan</label>
+                  <select
+                    value={bulan}
+                    onChange={(e) => {
+                      setBulan(Number(e.target.value));
+                      setAnalyticsDone(false);
+                      setResult(null);
+                    }}
+                    className="w-full sm:w-44 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500"
+                  >
+                    {[
+                      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                    ].map((m, idx) => (
+                      <option key={idx + 1} value={idx + 1}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-full sm:w-auto">
+                  <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Tahun Laporan</label>
+                  <select
+                    value={tahun}
+                    onChange={(e) => {
+                      setTahun(Number(e.target.value));
+                      setAnalyticsDone(false);
+                      setResult(null);
+                    }}
+                    className="w-full sm:w-32 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-teal-500"
+                  >
+                    {[2024, 2025, 2026, 2027].map((y) => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -376,6 +390,10 @@ export default function UploadPage() {
       {/* ===== PANEL KONTROL KELENGKAPAN UPLOAD OPD ===== */}
       <OpdUploadControlPanel
         refreshKey={refreshKey}
+        tahun={tahun}
+        setTahun={setTahun}
+        bulan={bulan}
+        setBulan={setBulan}
         onSelectTargetOpd={(opd) => {
           setTargetOpd(opd);
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -390,13 +408,19 @@ export default function UploadPage() {
 
 function OpdUploadControlPanel({
   refreshKey,
+  tahun,
+  setTahun,
+  bulan,
+  setBulan,
   onSelectTargetOpd,
 }: {
   refreshKey: number;
+  tahun: number;
+  setTahun: (t: number) => void;
+  bulan: number;
+  setBulan: (b: number) => void;
   onSelectTargetOpd: (opd: { id: number; nama_opd: string }) => void;
 }) {
-  const [tahun, setTahun] = useState(2026);
-  const [bulan, setBulan] = useState(6);
   const [loading, setLoading] = useState(true);
   const [statusData, setStatusData] = useState<any>(null);
   const [filterTab, setFilterTab] = useState<"ALL" | "SUDAH" | "BELUM">("ALL");
